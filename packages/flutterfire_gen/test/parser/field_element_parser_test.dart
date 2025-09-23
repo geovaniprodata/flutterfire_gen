@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -25,10 +27,8 @@ void main() {
   late final MockTypeChecker jsonConverterTypeChecker;
   late final MockTypeChecker jsonPostProcessorTypeChecker;
   late final MockTypeChecker allowFieldValueTypeChecker;
-  late final MockTypeChecker
-      alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker;
-  late final MockTypeChecker
-      alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker;
+  late final MockTypeChecker alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker;
+  late final MockTypeChecker alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker;
 
   setUpAll(() {
     readDefaultTypeChecker = MockTypeChecker();
@@ -41,24 +41,18 @@ void main() {
     when(jsonConverterTypeChecker.isAssignableFromType(any)).thenReturn(false);
     when(jsonConverterTypeChecker.isExactlyType(any)).thenReturn(false);
     jsonPostProcessorTypeChecker = MockTypeChecker();
-    when(jsonPostProcessorTypeChecker.isAssignableFromType(any))
-        .thenReturn(false);
+    when(jsonPostProcessorTypeChecker.isAssignableFromType(any)).thenReturn(false);
     when(jsonPostProcessorTypeChecker.isExactlyType(any)).thenReturn(false);
     allowFieldValueTypeChecker = MockTypeChecker();
-    when(allowFieldValueTypeChecker.isAssignableFromType(any))
-        .thenReturn(false);
+    when(allowFieldValueTypeChecker.isAssignableFromType(any)).thenReturn(false);
     when(allowFieldValueTypeChecker.isExactlyType(any)).thenReturn(false);
-    alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker =
-        MockTypeChecker();
+    alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker = MockTypeChecker();
     when(
-      alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker
-          .isExactlyType(any),
+      alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker.isExactlyType(any),
     ).thenReturn(false);
-    alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker =
-        MockTypeChecker();
+    alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker = MockTypeChecker();
     when(
-      alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker
-          .isExactlyType(any),
+      alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker.isExactlyType(any),
     ).thenReturn(false);
   });
 
@@ -67,47 +61,35 @@ void main() {
       final fooReadDefaultAnnotation = MockElementAnnotation();
       final fooReadDefaultDartObject = MockDartObject();
       final fooReadDefaultDartType = MockDartType();
-      when(fooReadDefaultAnnotation.toSource())
-          .thenReturn('@ReadDefault(<String, dynamic>{})');
-      when(fooReadDefaultAnnotation.computeConstantValue())
-          .thenReturn(fooReadDefaultDartObject);
+      when(fooReadDefaultAnnotation.toSource()).thenReturn('@ReadDefault(<String, dynamic>{})');
+      when(fooReadDefaultAnnotation.computeConstantValue()).thenReturn(fooReadDefaultDartObject);
       when(fooReadDefaultDartObject.type).thenReturn(fooReadDefaultDartType);
-      when(readDefaultTypeChecker.isAssignableFromType(fooReadDefaultDartType))
-          .thenReturn(true);
-      when(fooReadDefaultDartType.getDisplayString(withNullability: false))
-          .thenReturn('ReadDefault');
+      when(readDefaultTypeChecker.isAssignableFromType(fooReadDefaultDartType)).thenReturn(true);
+      when(fooReadDefaultDartType.getDisplayString(withNullability: false)).thenReturn('ReadDefault');
       when(fooReadDefaultDartType.isDartCoreString).thenReturn(false);
 
       final fooCreateDefaultAnnotation = MockElementAnnotation();
       final fooCreateDefaultDartObject = MockDartObject();
       final fooCreateDefaultDartType = MockDartType();
-      when(fooCreateDefaultAnnotation.toSource())
-          .thenReturn('@CreateDefault(<String, dynamic>{})');
-      when(fooCreateDefaultAnnotation.computeConstantValue())
-          .thenReturn(fooCreateDefaultDartObject);
-      when(fooCreateDefaultDartObject.type)
-          .thenReturn(fooCreateDefaultDartType);
+      when(fooCreateDefaultAnnotation.toSource()).thenReturn('@CreateDefault(<String, dynamic>{})');
+      when(fooCreateDefaultAnnotation.computeConstantValue()).thenReturn(fooCreateDefaultDartObject);
+      when(fooCreateDefaultDartObject.type).thenReturn(fooCreateDefaultDartType);
       when(
         createDefaultTypeChecker.isAssignableFromType(fooCreateDefaultDartType),
       ).thenReturn(true);
-      when(fooCreateDefaultDartType.getDisplayString(withNullability: false))
-          .thenReturn('CreateDefault');
+      when(fooCreateDefaultDartType.getDisplayString(withNullability: false)).thenReturn('CreateDefault');
       when(fooCreateDefaultDartType.isDartCoreString).thenReturn(false);
 
       final fooUpdateDefaultAnnotation = MockElementAnnotation();
       final fooUpdateDefaultDartObject = MockDartObject();
       final fooUpdateDefaultDartType = MockDartType();
-      when(fooUpdateDefaultAnnotation.toSource())
-          .thenReturn('@UpdateDefault(<String, dynamic>{})');
-      when(fooUpdateDefaultAnnotation.computeConstantValue())
-          .thenReturn(fooUpdateDefaultDartObject);
-      when(fooUpdateDefaultDartObject.type)
-          .thenReturn(fooUpdateDefaultDartType);
+      when(fooUpdateDefaultAnnotation.toSource()).thenReturn('@UpdateDefault(<String, dynamic>{})');
+      when(fooUpdateDefaultAnnotation.computeConstantValue()).thenReturn(fooUpdateDefaultDartObject);
+      when(fooUpdateDefaultDartObject.type).thenReturn(fooUpdateDefaultDartType);
       when(
         updateDefaultTypeChecker.isAssignableFromType(fooUpdateDefaultDartType),
       ).thenReturn(true);
-      when(fooUpdateDefaultDartType.getDisplayString(withNullability: false))
-          .thenReturn('UpdateDefault');
+      when(fooUpdateDefaultDartType.getDisplayString(withNullability: false)).thenReturn('UpdateDefault');
       when(fooUpdateDefaultDartType.isDartCoreString).thenReturn(false);
 
       final fooJsonConverterAnnotation = MockElementAnnotation();
@@ -117,14 +99,10 @@ void main() {
       final fooJsonConverterInterfaceType = MockInterfaceType();
       final fooJsonConverterClientDartType = MockDartType();
       final fooJsonConverterJsonType = MockDartType();
-      when(fooJsonConverterAnnotation.toSource())
-          .thenReturn('@_FooJsonConverter()');
-      when(fooJsonConverterAnnotation.computeConstantValue())
-          .thenReturn(fooJsonConverterDartObject);
-      when(fooJsonConverterDartObject.type)
-          .thenReturn(fooJsonConverterDartType);
-      when(fooJsonConverterDartType.element)
-          .thenReturn(fooJsonConverterClassElement);
+      when(fooJsonConverterAnnotation.toSource()).thenReturn('@_FooJsonConverter()');
+      when(fooJsonConverterAnnotation.computeConstantValue()).thenReturn(fooJsonConverterDartObject);
+      when(fooJsonConverterDartObject.type).thenReturn(fooJsonConverterDartType);
+      when(fooJsonConverterDartType.element).thenReturn(fooJsonConverterClassElement);
       when(fooJsonConverterClassElement.allSupertypes).thenReturn([
         fooJsonConverterInterfaceType,
       ]);
@@ -133,12 +111,9 @@ void main() {
         fooJsonConverterJsonType,
       ]);
       when(
-        fooJsonConverterClientDartType.getDisplayString(
-          withNullability: true,
-        ),
+        fooJsonConverterClientDartType.getDisplayString(),
       ).thenReturn('Foo');
-      when(fooJsonConverterJsonType.getDisplayString(withNullability: true))
-          .thenReturn('Map<String, dynamic>');
+      when(fooJsonConverterJsonType.getDisplayString()).thenReturn('Map<String, dynamic>');
       when(
         jsonConverterTypeChecker.isAssignableFromType(fooJsonConverterDartType),
       ).thenReturn(true);
@@ -153,14 +128,10 @@ void main() {
       final fooJsonPostProcessorInterfaceType = MockInterfaceType();
       final fooJsonPostProcessorClientDartType = MockDartType();
       final fooJsonPostProcessorJsonType = MockDartType();
-      when(fooJsonPostProcessorAnnotation.toSource())
-          .thenReturn('@_FooJsonConverter()');
-      when(fooJsonPostProcessorAnnotation.computeConstantValue())
-          .thenReturn(fooJsonPostProcessorDartObject);
-      when(fooJsonPostProcessorDartObject.type)
-          .thenReturn(fooJsonPostProcessorDartType);
-      when(fooJsonPostProcessorDartType.element)
-          .thenReturn(fooJsonPostProcessorClassElement);
+      when(fooJsonPostProcessorAnnotation.toSource()).thenReturn('@_FooJsonConverter()');
+      when(fooJsonPostProcessorAnnotation.computeConstantValue()).thenReturn(fooJsonPostProcessorDartObject);
+      when(fooJsonPostProcessorDartObject.type).thenReturn(fooJsonPostProcessorDartType);
+      when(fooJsonPostProcessorDartType.element).thenReturn(fooJsonPostProcessorClassElement);
       when(fooJsonPostProcessorClassElement.allSupertypes).thenReturn([
         fooJsonPostProcessorInterfaceType,
       ]);
@@ -169,44 +140,39 @@ void main() {
         fooJsonPostProcessorJsonType,
       ]);
       when(
-        fooJsonPostProcessorClientDartType.getDisplayString(
-          withNullability: true,
-        ),
+        fooJsonPostProcessorClientDartType.getDisplayString(),
       ).thenReturn('Foo');
       when(
-        fooJsonPostProcessorJsonType.getDisplayString(withNullability: true),
+        fooJsonPostProcessorJsonType.getDisplayString(),
       ).thenReturn('Map<String, dynamic>');
       when(
-        jsonPostProcessorTypeChecker
-            .isAssignableFromType(fooJsonPostProcessorDartType),
+        jsonPostProcessorTypeChecker.isAssignableFromType(fooJsonPostProcessorDartType),
       ).thenReturn(true);
       when(
-        jsonPostProcessorTypeChecker
-            .isExactlyType(fooJsonPostProcessorInterfaceType),
+        jsonPostProcessorTypeChecker.isExactlyType(fooJsonPostProcessorInterfaceType),
       ).thenReturn(true);
 
       final fooAllowFieldValueAnnotation = MockElementAnnotation();
       final fooAllowFieldValueDartObject = MockDartObject();
       final fooAllowFieldValueDartType = MockDartType();
-      when(fooAllowFieldValueAnnotation.computeConstantValue())
-          .thenReturn(fooAllowFieldValueDartObject);
-      when(fooAllowFieldValueDartObject.type)
-          .thenReturn(fooAllowFieldValueDartType);
-      when(allowFieldValueTypeChecker.isExactlyType(fooAllowFieldValueDartType))
-          .thenReturn(true);
+      when(fooAllowFieldValueAnnotation.computeConstantValue()).thenReturn(fooAllowFieldValueDartObject);
+      when(fooAllowFieldValueDartObject.type).thenReturn(fooAllowFieldValueDartType);
+      when(allowFieldValueTypeChecker.isExactlyType(fooAllowFieldValueDartType)).thenReturn(true);
 
       final fooFieldElement = MockFieldElement();
       final fieldElementDartType = MockDartType();
       when(fooFieldElement.name).thenReturn('foo');
       when(fooFieldElement.type).thenReturn(fieldElementDartType);
-      when(fooFieldElement.metadata).thenReturn([
-        fooReadDefaultAnnotation,
-        fooCreateDefaultAnnotation,
-        fooUpdateDefaultAnnotation,
-        fooJsonConverterAnnotation,
-        fooJsonPostProcessorAnnotation,
-        fooAllowFieldValueAnnotation,
-      ]);
+      when(fooFieldElement.metadata).thenReturn(
+        [
+          fooReadDefaultAnnotation,
+          fooCreateDefaultAnnotation,
+          fooUpdateDefaultAnnotation,
+          fooJsonConverterAnnotation,
+          fooJsonPostProcessorAnnotation,
+          fooAllowFieldValueAnnotation,
+        ] as Metadata,
+      );
 
       final fieldElementParser = FieldElementParser(
         readDefaultTypeChecker: readDefaultTypeChecker,
@@ -245,15 +211,11 @@ void main() {
     });
 
     test('parse DateTime? type updatedAt field', () {
-      final updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation =
-          MockElementAnnotation();
-      final updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingDartObject =
-          MockDartObject();
-      final updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingDartType =
-          MockDartType();
+      final updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation = MockElementAnnotation();
+      final updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingDartObject = MockDartObject();
+      final updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingDartType = MockDartType();
       when(
-        updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation
-            .computeConstantValue(),
+        updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation.computeConstantValue(),
       ).thenReturn(
         updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingDartObject,
       );
@@ -268,15 +230,11 @@ void main() {
         ),
       ).thenReturn(true);
 
-      final updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation =
-          MockElementAnnotation();
-      final updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingDartObject =
-          MockDartObject();
-      final updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingDartType =
-          MockDartType();
+      final updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation = MockElementAnnotation();
+      final updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingDartObject = MockDartObject();
+      final updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingDartType = MockDartType();
       when(
-        updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation
-            .computeConstantValue(),
+        updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation.computeConstantValue(),
       ).thenReturn(
         updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingDartObject,
       );
@@ -294,12 +252,13 @@ void main() {
       final updatedAtFieldElement = MockFieldElement();
       final updatedAtFieldElementDartType = MockDartType();
       when(updatedAtFieldElement.name).thenReturn('updatedAt');
-      when(updatedAtFieldElement.type)
-          .thenReturn(updatedAtFieldElementDartType);
-      when(updatedAtFieldElement.metadata).thenReturn([
-        updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation,
-        updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation,
-      ]);
+      when(updatedAtFieldElement.type).thenReturn(updatedAtFieldElementDartType);
+      when(updatedAtFieldElement.metadata).thenReturn(
+        [
+          updatedAtAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation,
+          updatedAtAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation,
+        ] as Metadata,
+      );
 
       final fieldElementParser = FieldElementParser(
         readDefaultTypeChecker: null,
@@ -308,10 +267,8 @@ void main() {
         jsonConverterTypeChecker: null,
         jsonPostProcessorTypeChecker: null,
         allowFieldValueTypeChecker: null,
-        alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker:
-            alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker,
-        alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker:
-            alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker,
+        alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker: alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker,
+        alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker: alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker,
       );
       final fieldConfig = fieldElementParser.parse(updatedAtFieldElement);
       expect(

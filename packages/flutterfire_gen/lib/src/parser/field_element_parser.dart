@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars, deprecated_member_use
+
 import 'package:analyzer/dart/element/element.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -111,8 +113,8 @@ class FieldElementParser {
   ///
   /// Returns a [FieldConfig] that contains parsed configurations.
   FieldConfig parse(FieldElement element) {
-    final annotations = element.metadata;
-    final readDefaultValueString = annotations
+    final metadata = element.metadata;
+    final readDefaultValueString = metadata.annotations
         .map(
           (annotation) => _parseDefaultAnnotation(
             defaultType: _DefaultType.read,
@@ -120,7 +122,7 @@ class FieldElementParser {
           ),
         )
         .firstWhere((value) => value != null, orElse: () => null);
-    final createDefaultValueString = annotations
+    final createDefaultValueString = metadata.annotations
         .map(
           (annotation) => _parseDefaultAnnotation(
             defaultType: _DefaultType.create,
@@ -128,7 +130,7 @@ class FieldElementParser {
           ),
         )
         .firstWhere((value) => value != null, orElse: () => null);
-    final updateDefaultValueString = annotations
+    final updateDefaultValueString = metadata.annotations
         .map(
           (annotation) => _parseDefaultAnnotation(
             defaultType: _DefaultType.update,
@@ -136,24 +138,16 @@ class FieldElementParser {
           ),
         )
         .firstWhere((value) => value != null, orElse: () => null);
-    final jsonConverterConfig = annotations
-        .map(_parseJsonConverterAnnotation)
-        .firstWhere((value) => value != null, orElse: () => null);
-    final jsonPostProcessorConfig = annotations
-        .map(_parseJsonPostProcessorAnnotation)
-        .firstWhere((value) => value != null, orElse: () => null);
-    final allowFieldValue = annotations
-        .map(_parseAllowFieldValueAnnotation)
-        .firstWhere((value) => value, orElse: () => false);
-    final alwaysUseFieldValueServerTimestampWhenCreating = annotations
-        .map(_parseAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation)
-        .firstWhere((value) => value, orElse: () => false);
-    final alwaysUseFieldValueServerTimestampWhenUpdating = annotations
-        .map(_parseAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation)
-        .firstWhere((value) => value, orElse: () => false);
+    final jsonConverterConfig = metadata.annotations.map(_parseJsonConverterAnnotation).firstWhere((value) => value != null, orElse: () => null);
+    final jsonPostProcessorConfig = metadata.annotations.map(_parseJsonPostProcessorAnnotation).firstWhere((value) => value != null, orElse: () => null);
+    final allowFieldValue = metadata.annotations.map(_parseAllowFieldValueAnnotation).firstWhere((value) => value, orElse: () => false);
+    final alwaysUseFieldValueServerTimestampWhenCreating =
+        metadata.annotations.map(_parseAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation).firstWhere((value) => value, orElse: () => false);
+    final alwaysUseFieldValueServerTimestampWhenUpdating =
+        metadata.annotations.map(_parseAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation).firstWhere((value) => value, orElse: () => false);
 
     return FieldConfig(
-      name: element.name,
+      name: element.name ?? element.displayName,
       dartType: element.type,
       readDefaultValueString: readDefaultValueString,
       createDefaultValueString: createDefaultValueString,
@@ -161,10 +155,8 @@ class FieldElementParser {
       jsonConverterConfig: jsonConverterConfig,
       jsonPostProcessorConfig: jsonPostProcessorConfig,
       allowFieldValue: allowFieldValue,
-      alwaysUseFieldValueServerTimestampWhenCreating:
-          alwaysUseFieldValueServerTimestampWhenCreating,
-      alwaysUseFieldValueServerTimestampWhenUpdating:
-          alwaysUseFieldValueServerTimestampWhenUpdating,
+      alwaysUseFieldValueServerTimestampWhenCreating: alwaysUseFieldValueServerTimestampWhenCreating,
+      alwaysUseFieldValueServerTimestampWhenUpdating: alwaysUseFieldValueServerTimestampWhenUpdating,
     );
   }
 
@@ -184,13 +176,10 @@ class FieldElementParser {
       return null;
     }
 
-    final defaultTypeString =
-        objectType.getDisplayString(withNullability: false);
-    final res =
-        source.substring('@$defaultTypeString('.length, source.length - 1);
-    final needsConstModifier = !objectType.isDartCoreString &&
-        !res.trimLeft().startsWith('const') &&
-        (res.contains('(') || res.contains('[') || res.contains('{'));
+    final defaultTypeString = objectType.getDisplayString(withNullability: false);
+    final res = source.substring('@$defaultTypeString('.length, source.length - 1);
+    final needsConstModifier =
+        !objectType.isDartCoreString && !res.trimLeft().startsWith('const') && (res.contains('(') || res.contains('[') || res.contains('{'));
     if (needsConstModifier) {
       return 'const $res';
     } else {
@@ -240,9 +229,7 @@ class FieldElementParser {
       return null;
     }
 
-    final interfaceTypes = (objectType.element! as ClassElement)
-        .allSupertypes
-        .where(typeChecker.isExactlyType);
+    final interfaceTypes = (objectType.element! as ClassElement).allSupertypes.where(typeChecker.isExactlyType);
     final typeArguments = interfaceTypes.first.typeArguments;
     if (typeArguments.length == 2) {
       final clientType = typeArguments[0];
@@ -252,8 +239,8 @@ class FieldElementParser {
       if (match != null) {
         return JsonConverterConfig(
           jsonConverterString: match.group(1)!,
-          clientTypeString: clientType.getDisplayString(withNullability: true),
-          firestoreTypeString: jsonType.getDisplayString(withNullability: true),
+          clientTypeString: clientType.getDisplayString(),
+          firestoreTypeString: jsonType.getDisplayString(),
         );
       }
       return null;
@@ -276,9 +263,7 @@ class FieldElementParser {
       return null;
     }
 
-    final interfaceTypes = (objectType.element! as ClassElement)
-        .allSupertypes
-        .where(typeChecker.isExactlyType);
+    final interfaceTypes = (objectType.element! as ClassElement).allSupertypes.where(typeChecker.isExactlyType);
     final typeArguments = interfaceTypes.first.typeArguments;
     if (typeArguments.length == 2) {
       final clientType = typeArguments[0];
@@ -288,8 +273,8 @@ class FieldElementParser {
       if (match != null) {
         return JsonPostProcessorConfig(
           jsonPostProcessorString: match.group(1)!,
-          clientTypeString: clientType.getDisplayString(withNullability: true),
-          firestoreTypeString: jsonType.getDisplayString(withNullability: true),
+          clientTypeString: clientType.getDisplayString(),
+          firestoreTypeString: jsonType.getDisplayString(),
         );
       }
       return null;
@@ -297,8 +282,7 @@ class FieldElementParser {
     return null;
   }
 
-  bool _parseAllowFieldValueAnnotation(ElementAnnotation annotation) =>
-      _parseBoolTypeAnnotation(
+  bool _parseAllowFieldValueAnnotation(ElementAnnotation annotation) => _parseBoolTypeAnnotation(
         annotation: annotation,
         typeChecker: allowFieldValueTypeChecker,
       );

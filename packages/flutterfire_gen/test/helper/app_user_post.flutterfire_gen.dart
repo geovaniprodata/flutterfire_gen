@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
@@ -35,11 +36,10 @@ class ReadAppUserPost {
       ...json,
     };
     return ReadAppUserPost(
-      content: extendedJson['content'] as String? ?? '',
-      numbers: (extendedJson['numbers'] as List<dynamic>?)
-              ?.map((e) => e as int)
-              .toList() ??
-          const <int>[],
+      content: extendedJson['content'] as String,
+      numbers: (extendedJson['numbers'] as List<dynamic>)
+          .map((e) => e as int)
+          .toList(),
       updatedAt: (extendedJson['updatedAt'] as Timestamp?)?.toDate(),
       appUserPostId: extendedJson['appUserPostId'] as String,
       path: extendedJson['path'] as String,
@@ -89,17 +89,20 @@ class CreateAppUserPost {
   const CreateAppUserPost({
     required this.content,
     required this.numbers,
+    this.updatedAt,
   });
 
   final String content;
 
-  final FirestoreData<List<int>> numbers;
+  final List<int> numbers;
+
+  final DateTime? updatedAt;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
       'content': content,
-      'numbers': numbers.value,
-      'updatedAt': FieldValue.serverTimestamp(),
+      'numbers': numbers,
+      'updatedAt': updatedAt == null ? null : Timestamp.fromDate(updatedAt!),
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {
@@ -120,17 +123,21 @@ class UpdateAppUserPost {
   const UpdateAppUserPost({
     this.content,
     this.numbers,
+    this.updatedAt,
   });
 
   final String? content;
 
-  final FirestoreData<List<int>>? numbers;
+  final List<int>? numbers;
+
+  final DateTime? updatedAt;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
       if (content != null) 'content': content,
-      if (numbers != null) 'numbers': numbers!.value,
-      'updatedAt': FieldValue.serverTimestamp(),
+      if (numbers != null) 'numbers': numbers,
+      if (updatedAt != null)
+        'updatedAt': updatedAt == null ? null : Timestamp.fromDate(updatedAt!),
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {

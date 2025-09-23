@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
@@ -33,8 +34,6 @@ class ReadAppUserPostLikeTask {
   factory ReadAppUserPostLikeTask.fromJson(Map<String, dynamic> json) {
     final extendedJson = <String, dynamic>{
       ...json,
-      'appUserId': _AppUserIdRefJsonPostProcessor().fromJson(json),
-      'appUserPostId': _AppUserPostIdRefJsonPostProcessor().fromJson(json),
     };
     return ReadAppUserPostLikeTask(
       appUserId: extendedJson['appUserId'] as String,
@@ -107,12 +106,7 @@ class CreateAppUserPostLikeTask {
       'appUserPostId': appUserPostId,
       'appUserPostLikeId': appUserPostLikeId,
     };
-    final jsonPostProcessors = <({String key, dynamic value})>[
-      if (json.containsKey('appUserId'))
-        _AppUserIdRefJsonPostProcessor().toJson(json),
-      if (json.containsKey('appUserPostId'))
-        _AppUserPostIdRefJsonPostProcessor().toJson(json),
-    ];
+    final jsonPostProcessors = <({String key, dynamic value})>[];
     return {
       ...json,
       ...Map.fromEntries(jsonPostProcessors
@@ -146,12 +140,7 @@ class UpdateAppUserPostLikeTask {
       if (appUserPostId != null) 'appUserPostId': appUserPostId,
       if (appUserPostLikeId != null) 'appUserPostLikeId': appUserPostLikeId,
     };
-    final jsonPostProcessors = <({String key, dynamic value})>[
-      if (json.containsKey('appUserId'))
-        _AppUserIdRefJsonPostProcessor().toJson(json),
-      if (json.containsKey('appUserPostId'))
-        _AppUserPostIdRefJsonPostProcessor().toJson(json),
-    ];
+    final jsonPostProcessors = <({String key, dynamic value})>[];
     return {
       ...json,
       ...Map.fromEntries(jsonPostProcessors

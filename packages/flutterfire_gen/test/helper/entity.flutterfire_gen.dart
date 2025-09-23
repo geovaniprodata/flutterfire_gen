@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
@@ -165,100 +166,80 @@ class ReadEntity {
     };
     return ReadEntity(
       text: extendedJson['text'] as String,
-      textWithDefault:
-          extendedJson['textWithDefault'] as String? ?? 'requiredWithDefault',
-      nullableText: extendedJson['nullableText'] as String? ?? 'defaultText',
+      textWithDefault: extendedJson['textWithDefault'] as String,
+      nullableText: extendedJson['nullableText'] as String?,
       integer: extendedJson['integer'] as int,
-      integerWithDefault: extendedJson['integerWithDefault'] as int? ?? 0,
-      nullableInteger: extendedJson['nullableInteger'] as int? ?? 0,
+      integerWithDefault: extendedJson['integerWithDefault'] as int,
+      nullableInteger: extendedJson['nullableInteger'] as int?,
       doubleNumber: extendedJson['doubleNumber'] as double,
       doubleNumberWithDefault:
-          extendedJson['doubleNumberWithDefault'] as double? ?? 3.14,
-      nullableDoubleNumber:
-          extendedJson['nullableDoubleNumber'] as double? ?? 3.14,
+          extendedJson['doubleNumberWithDefault'] as double,
+      nullableDoubleNumber: extendedJson['nullableDoubleNumber'] as double?,
       isBool: extendedJson['isBool'] as bool,
-      isBoolWithDefault: extendedJson['isBoolWithDefault'] as bool? ?? false,
-      nullableIsBool: extendedJson['nullableIsBool'] as bool? ?? false,
+      isBoolWithDefault: extendedJson['isBoolWithDefault'] as bool,
+      nullableIsBool: extendedJson['nullableIsBool'] as bool?,
       texts: (extendedJson['texts'] as List<dynamic>)
           .map((e) => e as String)
           .toList(),
-      textsWithDefault: (extendedJson['textsWithDefault'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const <String>['requiredWithDefault'],
+      textsWithDefault: (extendedJson['textsWithDefault'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
       nullableTexts: (extendedJson['nullableTexts'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const <String>[],
+          ?.map((e) => e as String)
+          .toList(),
       map: extendedJson['map'] as Map<String, dynamic>,
-      mapWithDefault: extendedJson['mapWithDefault'] as Map<String, dynamic>? ??
-          const <String, dynamic>{},
-      nullableMap: extendedJson['nullableMap'] as Map<String, dynamic>? ??
-          const <String, dynamic>{},
+      mapWithDefault: extendedJson['mapWithDefault'] as Map<String, dynamic>,
+      nullableMap: extendedJson['nullableMap'] as Map<String, dynamic>?,
       stringMap: (extendedJson['stringMap'] as Map<String, dynamic>)
           .map((k, v) => MapEntry(k, v as String)),
       stringMapWithDefault:
-          (extendedJson['stringMapWithDefault'] as Map<String, dynamic>?)
-                  ?.map((k, v) => MapEntry(k, v as String)) ??
-              const <String, String>{},
+          (extendedJson['stringMapWithDefault'] as Map<String, dynamic>)
+              .map((k, v) => MapEntry(k, v as String)),
       nullableStringMap:
           (extendedJson['nullableStringMap'] as Map<String, dynamic>?)
-                  ?.map((k, v) => MapEntry(k, v as String)) ??
-              const <String, String>{},
+              ?.map((k, v) => MapEntry(k, v as String)),
       nestedMap: (extendedJson['nestedMap'] as Map<String, dynamic>).map(
           (k, v) => MapEntry(
               k,
               (v as Map<String, dynamic>)
                   .map((k, v) => MapEntry(k, v as int)))),
       nestedMapWithDefault:
-          (extendedJson['nestedMapWithDefault'] as Map<String, dynamic>?)?.map(
-                  (k, v) => MapEntry(
-                      k,
-                      (v as Map<String, dynamic>)
-                          .map((k, v) => MapEntry(k, v as int)))) ??
-              const <String, Map<String, int>>{
-                'requiredWithDefault': <String, int>{}
-              },
+          (extendedJson['nestedMapWithDefault'] as Map<String, dynamic>).map(
+              (k, v) => MapEntry(
+                  k,
+                  (v as Map<String, dynamic>)
+                      .map((k, v) => MapEntry(k, v as int)))),
       nullableNestedMap:
           (extendedJson['nullableNestedMap'] as Map<String, dynamic>?)?.map(
-                  (k, v) => MapEntry(
-                      k,
-                      (v as Map<String, dynamic>)
-                          .map((k, v) => MapEntry(k, v as int)))) ??
-              const <String, Map<String, int>>{},
+              (k, v) => MapEntry(
+                  k,
+                  (v as Map<String, dynamic>)
+                      .map((k, v) => MapEntry(k, v as int)))),
       listMap: (extendedJson['listMap'] as Map<String, dynamic>).map((k, v) =>
           MapEntry(k, (v as List<dynamic>).map((e) => e as int).toList())),
-      listMapWithDefault:
-          (extendedJson['listMapWithDefault'] as Map<String, dynamic>?)?.map(
-                  (k, v) => MapEntry(
-                      k, (v as List<dynamic>).map((e) => e as int).toList())) ??
-              const <String, List<int>>{'requiredWithDefault': <int>[]},
-      nullableListMap:
-          (extendedJson['nullableListMap'] as Map<String, dynamic>?)?.map(
-                  (k, v) => MapEntry(
-                      k, (v as List<dynamic>).map((e) => e as int).toList())) ??
-              const <String, List<int>>{},
+      listMapWithDefault: (extendedJson['listMapWithDefault']
+              as Map<String, dynamic>)
+          .map((k, v) =>
+              MapEntry(k, (v as List<dynamic>).map((e) => e as int).toList())),
+      nullableListMap: (extendedJson['nullableListMap']
+              as Map<String, dynamic>?)
+          ?.map((k, v) =>
+              MapEntry(k, (v as List<dynamic>).map((e) => e as int).toList())),
       mapList: (extendedJson['mapList'] as List<dynamic>)
           .map((e) =>
               (e as Map<String, dynamic>).map((k, v) => MapEntry(k, v as int)))
           .toList(),
-      mapListWithDefault: (extendedJson['mapListWithDefault'] as List<dynamic>?)
-              ?.map((e) => (e as Map<String, dynamic>)
-                  .map((k, v) => MapEntry(k, v as int)))
-              .toList() ??
-          const <Map<String, int>>[
-            <String, int>{'requiredWithDefault': 0}
-          ],
+      mapListWithDefault: (extendedJson['mapListWithDefault'] as List<dynamic>)
+          .map((e) =>
+              (e as Map<String, dynamic>).map((k, v) => MapEntry(k, v as int)))
+          .toList(),
       nullableMapList: (extendedJson['nullableMapList'] as List<dynamic>?)
-              ?.map((e) => (e as Map<String, dynamic>)
-                  .map((k, v) => MapEntry(k, v as int)))
-              .toList() ??
-          const <Map<String, int>>[],
+          ?.map((e) =>
+              (e as Map<String, dynamic>).map((k, v) => MapEntry(k, v as int)))
+          .toList(),
       geoPoint: extendedJson['geoPoint'] as GeoPoint,
-      geoPointWithDefault: extendedJson['geoPointWithDefault'] as GeoPoint? ??
-          const GeoPoint(0, 0),
-      nullableGeoPoint:
-          extendedJson['nullableGeoPoint'] as GeoPoint? ?? const GeoPoint(0, 0),
+      geoPointWithDefault: extendedJson['geoPointWithDefault'] as GeoPoint,
+      nullableGeoPoint: extendedJson['nullableGeoPoint'] as GeoPoint?,
       dateTime: (extendedJson['dateTime'] as Timestamp).toDate(),
       nullableDateTime:
           (extendedJson['nullableDateTime'] as Timestamp?)?.toDate(),
@@ -268,17 +249,11 @@ class ReadEntity {
           extendedJson['documentReference'] as DocumentReference<Object?>,
       nullableDocumentReference: extendedJson['nullableDocumentReference']
           as DocumentReference<Object?>?,
-      foo: _FooJsonConverter()
-          .fromJson(extendedJson['foo'] as Map<String, dynamic>),
-      fooWithDefault: extendedJson['fooWithDefault'] == null
-          ? const Foo('requiredWithDefault')
-          : _FooJsonConverter()
-              .fromJson(extendedJson['fooWithDefault'] as Map<String, dynamic>),
-      nullableFoo: _nullableFooJsonConverter
-          .fromJson(extendedJson['nullableFoo'] as Map<String, dynamic>),
-      nullableFooWithDefaultAnnotation: _FooJsonConverter().fromJson(
-          extendedJson['nullableFooWithDefaultAnnotation']
-              as Map<String, dynamic>),
+      foo: extendedJson['foo'] as Foo,
+      fooWithDefault: extendedJson['fooWithDefault'] as Foo,
+      nullableFoo: extendedJson['nullableFoo'] as Foo?,
+      nullableFooWithDefaultAnnotation:
+          extendedJson['nullableFooWithDefaultAnnotation'] as Foo?,
       fieldValueAllowedInt: extendedJson['fieldValueAllowedInt'] as int,
       fieldValueAllowedNullableInt:
           extendedJson['fieldValueAllowedNullableInt'] as int?,
@@ -424,7 +399,7 @@ class ReadEntity {
 class CreateEntity {
   const CreateEntity({
     required this.text,
-    this.textWithDefault,
+    required this.textWithDefault,
     this.nullableText,
     required this.integer,
     required this.integerWithDefault,
@@ -473,7 +448,7 @@ class CreateEntity {
 
   final String text;
 
-  final String? textWithDefault;
+  final String textWithDefault;
 
   final String? nullableText;
 
@@ -557,17 +532,17 @@ class CreateEntity {
 
   final Foo? nullableFooWithDefaultAnnotation;
 
-  final FirestoreData<int> fieldValueAllowedInt;
+  final int fieldValueAllowedInt;
 
-  final FirestoreData<int>? fieldValueAllowedNullableInt;
+  final int? fieldValueAllowedNullableInt;
 
-  final FirestoreData<int>? fieldValueAllowedNullableIntWithDefaultAnnotation;
+  final int? fieldValueAllowedNullableIntWithDefaultAnnotation;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
       'text': text,
-      'textWithDefault': textWithDefault ?? 'createDefault',
-      'nullableText': nullableText ?? 'createDefault',
+      'textWithDefault': textWithDefault,
+      'nullableText': nullableText,
       'integer': integer,
       'integerWithDefault': integerWithDefault,
       'nullableInteger': nullableInteger,
@@ -606,17 +581,14 @@ class CreateEntity {
       'nullableTimestamp': nullableTimestamp,
       'documentReference': documentReference,
       'nullableDocumentReference': nullableDocumentReference,
-      'foo': _FooJsonConverter().toJson(foo),
-      'fooWithDefault': _FooJsonConverter().toJson(fooWithDefault),
-      'nullableFoo': _nullableFooJsonConverter.toJson(nullableFoo),
-      'nullableFooWithDefaultAnnotation':
-          nullableFooWithDefaultAnnotation == null
-              ? const Foo('defaultBar')
-              : _FooJsonConverter().toJson(nullableFooWithDefaultAnnotation!),
-      'fieldValueAllowedInt': fieldValueAllowedInt.value,
-      'fieldValueAllowedNullableInt': fieldValueAllowedNullableInt?.value,
+      'foo': foo,
+      'fooWithDefault': fooWithDefault,
+      'nullableFoo': nullableFoo,
+      'nullableFooWithDefaultAnnotation': nullableFooWithDefaultAnnotation,
+      'fieldValueAllowedInt': fieldValueAllowedInt,
+      'fieldValueAllowedNullableInt': fieldValueAllowedNullableInt,
       'fieldValueAllowedNullableIntWithDefaultAnnotation':
-          fieldValueAllowedNullableIntWithDefaultAnnotation?.value ?? 0,
+          fieldValueAllowedNullableIntWithDefaultAnnotation,
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {
@@ -769,17 +741,17 @@ class UpdateEntity {
 
   final Foo? nullableFooWithDefaultAnnotation;
 
-  final FirestoreData<int>? fieldValueAllowedInt;
+  final int? fieldValueAllowedInt;
 
-  final FirestoreData<int>? fieldValueAllowedNullableInt;
+  final int? fieldValueAllowedNullableInt;
 
-  final FirestoreData<int>? fieldValueAllowedNullableIntWithDefaultAnnotation;
+  final int? fieldValueAllowedNullableIntWithDefaultAnnotation;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
       if (text != null) 'text': text,
-      'textWithDefault': textWithDefault ?? 'updateDefault',
-      'nullableText': nullableText ?? 'updateDefault',
+      if (textWithDefault != null) 'textWithDefault': textWithDefault,
+      if (nullableText != null) 'nullableText': nullableText,
       if (integer != null) 'integer': integer,
       if (integerWithDefault != null) 'integerWithDefault': integerWithDefault,
       if (nullableInteger != null) 'nullableInteger': nullableInteger,
@@ -825,21 +797,18 @@ class UpdateEntity {
       if (documentReference != null) 'documentReference': documentReference,
       if (nullableDocumentReference != null)
         'nullableDocumentReference': nullableDocumentReference,
-      if (foo != null) 'foo': _FooJsonConverter().toJson(foo!),
-      if (fooWithDefault != null)
-        'fooWithDefault': _FooJsonConverter().toJson(fooWithDefault!),
-      if (nullableFoo != null)
-        'nullableFoo': _nullableFooJsonConverter.toJson(nullableFoo!),
+      if (foo != null) 'foo': foo,
+      if (fooWithDefault != null) 'fooWithDefault': fooWithDefault,
+      if (nullableFoo != null) 'nullableFoo': nullableFoo,
       if (nullableFooWithDefaultAnnotation != null)
-        'nullableFooWithDefaultAnnotation':
-            _FooJsonConverter().toJson(nullableFooWithDefaultAnnotation!),
+        'nullableFooWithDefaultAnnotation': nullableFooWithDefaultAnnotation,
       if (fieldValueAllowedInt != null)
-        'fieldValueAllowedInt': fieldValueAllowedInt!.value,
+        'fieldValueAllowedInt': fieldValueAllowedInt,
       if (fieldValueAllowedNullableInt != null)
-        'fieldValueAllowedNullableInt': fieldValueAllowedNullableInt!.value,
+        'fieldValueAllowedNullableInt': fieldValueAllowedNullableInt,
       if (fieldValueAllowedNullableIntWithDefaultAnnotation != null)
         'fieldValueAllowedNullableIntWithDefaultAnnotation':
-            fieldValueAllowedNullableIntWithDefaultAnnotation!.value,
+            fieldValueAllowedNullableIntWithDefaultAnnotation,
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {

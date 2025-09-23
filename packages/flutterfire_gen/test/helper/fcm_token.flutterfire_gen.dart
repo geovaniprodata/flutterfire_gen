@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
@@ -32,8 +33,9 @@ class ReadFcmToken {
       ...json,
     };
     return ReadFcmToken(
-      tokenAndDevices: _tokenAndDevicesConverter
-          .fromJson(extendedJson['tokenAndDevices'] as List<dynamic>?),
+      tokenAndDevices: (extendedJson['tokenAndDevices'] as List<dynamic>)
+          .map((e) => e as TokenAndDevice)
+          .toList(),
       createdAt: (extendedJson['createdAt'] as Timestamp?)?.toDate(),
       fcmTokenId: extendedJson['fcmTokenId'] as String,
       path: extendedJson['path'] as String,
@@ -80,15 +82,17 @@ class ReadFcmToken {
 class CreateFcmToken {
   const CreateFcmToken({
     required this.tokenAndDevices,
+    this.createdAt,
   });
 
-  final FirestoreData<List<TokenAndDevice>> tokenAndDevices;
+  final List<TokenAndDevice> tokenAndDevices;
+
+  final DateTime? createdAt;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
-      'tokenAndDevices':
-          _tokenAndDevicesConverter.toJson(tokenAndDevices.actualValue),
-      'createdAt': FieldValue.serverTimestamp(),
+      'tokenAndDevices': tokenAndDevices,
+      'createdAt': createdAt == null ? null : Timestamp.fromDate(createdAt!),
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {
@@ -111,15 +115,13 @@ class UpdateFcmToken {
     this.createdAt,
   });
 
-  final FirestoreData<List<TokenAndDevice>>? tokenAndDevices;
+  final List<TokenAndDevice>? tokenAndDevices;
 
   final DateTime? createdAt;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
-      if (tokenAndDevices != null)
-        'tokenAndDevices':
-            _tokenAndDevicesConverter.toJson(tokenAndDevices!.actualValue),
+      if (tokenAndDevices != null) 'tokenAndDevices': tokenAndDevices,
       if (createdAt != null)
         'createdAt': createdAt == null ? null : Timestamp.fromDate(createdAt!),
     };

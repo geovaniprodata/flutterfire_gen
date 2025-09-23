@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart';
-import 'package:flutterfire_gen_utils/flutterfire_gen_utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'entity.flutterfire_gen.dart';
@@ -212,8 +211,7 @@ class _FooJsonConverter implements JsonConverter<Foo, Map<String, dynamic>> {
 
 const _nullableFooJsonConverter = _NullableFooJsonConverter();
 
-class _NullableFooJsonConverter
-    implements JsonConverter<Foo?, Map<String, dynamic>> {
+class _NullableFooJsonConverter implements JsonConverter<Foo?, Map<String, dynamic>> {
   const _NullableFooJsonConverter();
 
   @override

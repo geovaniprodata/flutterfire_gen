@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart';
-import 'package:flutterfire_gen_utils/flutterfire_gen_utils.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'fcm_token.flutterfire_gen.dart';
@@ -33,8 +32,7 @@ class TokenAndDevice {
 
 const _tokenAndDevicesConverter = TokenAndDevicesConverter();
 
-class TokenAndDevicesConverter
-    implements JsonConverter<List<TokenAndDevice>, List<dynamic>?> {
+class TokenAndDevicesConverter implements JsonConverter<List<TokenAndDevice>, List<dynamic>?> {
   const TokenAndDevicesConverter();
 
   @override
@@ -48,13 +46,12 @@ class TokenAndDevicesConverter
       .toList();
 
   @override
-  List<Map<String, String>> toJson(List<TokenAndDevice> tokenAndDevices) =>
-      tokenAndDevices
-          .map(
-            (tokenAndDevice) => {
-              'token': tokenAndDevice.token,
-              'deviceInfo': tokenAndDevice.deviceInfo,
-            },
-          )
-          .toList();
+  List<Map<String, String>> toJson(List<TokenAndDevice> tokenAndDevices) => tokenAndDevices
+      .map(
+        (tokenAndDevice) => {
+          'token': tokenAndDevice.token,
+          'deviceInfo': tokenAndDevice.deviceInfo,
+        },
+      )
+      .toList();
 }

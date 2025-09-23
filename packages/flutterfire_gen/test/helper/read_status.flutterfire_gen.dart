@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
@@ -71,11 +72,15 @@ class ReadReadStatus {
 /// `@alwaysUseFieldValueServerTimestampWhenCreating` annotated fields are
 /// automatically set to the server's timestamp.
 class CreateReadStatus {
-  const CreateReadStatus();
+  const CreateReadStatus({
+    this.lastReadAt,
+  });
+
+  final DateTime? lastReadAt;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
-      'lastReadAt': FieldValue.serverTimestamp(),
+      'lastReadAt': lastReadAt == null ? null : Timestamp.fromDate(lastReadAt!),
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {
@@ -93,11 +98,17 @@ class CreateReadStatus {
 /// sets the `@alwaysUseFieldValueServerTimestampWhenUpdating` annotated fields
 /// to the server's timestamp upon updating.
 class UpdateReadStatus {
-  const UpdateReadStatus();
+  const UpdateReadStatus({
+    this.lastReadAt,
+  });
+
+  final DateTime? lastReadAt;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
-      'lastReadAt': FieldValue.serverTimestamp(),
+      if (lastReadAt != null)
+        'lastReadAt':
+            lastReadAt == null ? null : Timestamp.fromDate(lastReadAt!),
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {

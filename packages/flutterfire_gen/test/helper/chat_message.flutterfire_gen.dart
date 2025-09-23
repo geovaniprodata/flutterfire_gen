@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
@@ -58,8 +59,7 @@ class ReadChatMessage {
     };
     return ReadChatMessage(
       senderId: extendedJson['senderId'] as String,
-      map: extendedJson['map'] as Map<String, dynamic>? ??
-          const <String, dynamic>{},
+      map: extendedJson['map'] as Map<String, dynamic>,
       nestedMap: (extendedJson['nestedMap'] as Map<String, dynamic>).map(
           (k, v) => MapEntry(
               k,
@@ -68,14 +68,12 @@ class ReadChatMessage {
       deeplyNestedMap: (extendedJson['deeplyNestedMap'] as Map<String, dynamic>)
           .map((k, v) => MapEntry(
               k, v as Map<int, List<Map<String, Map<String, dynamic>>>>)),
-      chatMessageType: _chatMessageTypeConverter
-          .fromJson(extendedJson['chatMessageType'] as String),
-      content: extendedJson['content'] as String? ?? '',
-      imageUrls: (extendedJson['imageUrls'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const <String>[],
-      isDeleted: extendedJson['isDeleted'] as bool? ?? false,
+      chatMessageType: extendedJson['chatMessageType'] as ChatMessageType,
+      content: extendedJson['content'] as String,
+      imageUrls: (extendedJson['imageUrls'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      isDeleted: extendedJson['isDeleted'] as bool,
       createdAt: (extendedJson['createdAt'] as Timestamp?)?.toDate(),
       updatedAt: (extendedJson['updatedAt'] as Timestamp?)?.toDate(),
       chatMessageId: extendedJson['chatMessageId'] as String,
@@ -145,8 +143,10 @@ class CreateChatMessage {
     required this.deeplyNestedMap,
     required this.chatMessageType,
     required this.content,
-    this.imageUrls,
-    this.isDeleted,
+    required this.imageUrls,
+    required this.isDeleted,
+    this.createdAt,
+    this.updatedAt,
   });
 
   final String senderId;
@@ -162,9 +162,13 @@ class CreateChatMessage {
 
   final String content;
 
-  final List<String>? imageUrls;
+  final List<String> imageUrls;
 
-  final bool? isDeleted;
+  final bool isDeleted;
+
+  final DateTime? createdAt;
+
+  final DateTime? updatedAt;
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
@@ -172,12 +176,12 @@ class CreateChatMessage {
       'map': map,
       'nestedMap': nestedMap,
       'deeplyNestedMap': deeplyNestedMap,
-      'chatMessageType': _chatMessageTypeConverter.toJson(chatMessageType),
+      'chatMessageType': chatMessageType,
       'content': content,
-      'imageUrls': imageUrls ?? const <String>[],
-      'isDeleted': isDeleted ?? false,
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
+      'imageUrls': imageUrls,
+      'isDeleted': isDeleted,
+      'createdAt': createdAt == null ? null : Timestamp.fromDate(createdAt!),
+      'updatedAt': updatedAt == null ? null : Timestamp.fromDate(updatedAt!),
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {
@@ -205,6 +209,7 @@ class UpdateChatMessage {
     this.imageUrls,
     this.isDeleted,
     this.createdAt,
+    this.updatedAt,
   });
 
   final String? senderId;
@@ -226,20 +231,22 @@ class UpdateChatMessage {
 
   final DateTime? createdAt;
 
+  final DateTime? updatedAt;
+
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{
       if (senderId != null) 'senderId': senderId,
       if (map != null) 'map': map,
       if (nestedMap != null) 'nestedMap': nestedMap,
       if (deeplyNestedMap != null) 'deeplyNestedMap': deeplyNestedMap,
-      if (chatMessageType != null)
-        'chatMessageType': _chatMessageTypeConverter.toJson(chatMessageType!),
+      if (chatMessageType != null) 'chatMessageType': chatMessageType,
       if (content != null) 'content': content,
       if (imageUrls != null) 'imageUrls': imageUrls,
       if (isDeleted != null) 'isDeleted': isDeleted,
       if (createdAt != null)
         'createdAt': createdAt == null ? null : Timestamp.fromDate(createdAt!),
-      'updatedAt': FieldValue.serverTimestamp(),
+      if (updatedAt != null)
+        'updatedAt': updatedAt == null ? null : Timestamp.fromDate(updatedAt!),
     };
     final jsonPostProcessors = <({String key, dynamic value})>[];
     return {
