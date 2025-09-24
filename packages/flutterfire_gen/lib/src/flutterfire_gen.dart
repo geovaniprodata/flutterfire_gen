@@ -1,6 +1,3 @@
-// ignore_for_file: lines_longer_than_80_chars, unused_import, directives_ordering, avoid_classes_with_only_static_members, public_member_api_docs
-
-import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart';
@@ -44,8 +41,6 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
     ConstantReader annotation,
     BuildStep buildStep,
   ) {
-    final name = element.name ?? element.displayName;
-
     if (element is! ClassElement) {
       throw InvalidGenerationSourceError(
         '@FirestoreDocument can only be applied on classes. '
@@ -54,20 +49,20 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
       );
     }
 
-    if (!name.startsWith(_buildYamlConfig.schemaDefinitionClassPrefix)) {
+    if (!element.name.startsWith(_buildYamlConfig.schemaDefinitionClassPrefix)) {
       throw InvalidGenerationSourceError(
-        '$name must start with '
+        '${element.name} must start with '
         "'${_buildYamlConfig.schemaDefinitionClassPrefix}'. "
         'Because you set schema_definition_class_prefix to '
         "'${_buildYamlConfig.schemaDefinitionClassPrefix}' in build.yaml. "
-        'Failing element: $name',
+        'Failing element: ${element.name}',
         element: element,
       );
     }
 
-    final baseClassName = name.replaceFirst(_buildYamlConfig.schemaDefinitionClassPrefix, '');
+    final baseClassName = element.name.replaceFirst(_buildYamlConfig.schemaDefinitionClassPrefix, '');
 
-    final annotation = const TypeChecker.typeNamed(FirestoreDocument).firstAnnotationOf(element, throwOnUnresolved: false)!;
+    final annotation = const TypeChecker.fromRuntime(FirestoreDocument).firstAnnotationOf(element, throwOnUnresolved: false)!;
 
     final config = CodeGenerationConfig(
       baseClassName: baseClassName,
@@ -137,15 +132,19 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
       ),
       fieldConfigs: element.fields
           .map(
-            FieldElementParser(
-              readDefaultTypeChecker: TypeCheckerHelper.readDefault,
-              createDefaultTypeChecker: TypeCheckerHelper.createDefault,
-              updateDefaultTypeChecker: TypeCheckerHelper.updateDefault,
-              jsonConverterTypeChecker: TypeCheckerHelper.jsonConverter,
-              jsonPostProcessorTypeChecker: TypeCheckerHelper.jsonPostProcessor,
-              allowFieldValueTypeChecker: TypeCheckerHelper.allowFieldValue,
-              alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker: TypeCheckerHelper.alwaysUseFieldValueServerTimestampWhenCreating,
-              alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker: TypeCheckerHelper.alwaysUseFieldValueServerTimestampWhenUpdating,
+            const FieldElementParser(
+              readDefaultTypeChecker: TypeChecker.fromRuntime(ReadDefault),
+              createDefaultTypeChecker: TypeChecker.fromRuntime(CreateDefault),
+              updateDefaultTypeChecker: TypeChecker.fromRuntime(UpdateDefault),
+              jsonConverterTypeChecker: TypeChecker.fromRuntime(JsonConverter),
+              jsonPostProcessorTypeChecker: TypeChecker.fromRuntime(JsonPostProcessor),
+              allowFieldValueTypeChecker: TypeChecker.fromRuntime(AllowFieldValue),
+              alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker: TypeChecker.fromRuntime(
+                AlwaysUseFieldValueServerTimestampWhenCreating,
+              ),
+              alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker: TypeChecker.fromRuntime(
+                AlwaysUseFieldValueServerTimestampWhenUpdating,
+              ),
             ).parse,
           )
           .toList(),
@@ -161,37 +160,4 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
 
     return buffer.toString();
   }
-}
-
-// Adicione esta classe helper no seu arquivo
-class TypeCheckerHelper {
-  static TypeChecker createChecker(Type className, String package) {
-    try {
-      // Tenta métodos alternativos baseados no nome da classe
-      // Se você tiver acesso às classes runtime, pode tentar reflection
-      return TypeChecker.typeNamed(className, inPackage: package);
-    } catch (e) {
-      // Fallback seguro
-      throw StateError('Cannot create TypeChecker for $className from $package: $e');
-    }
-  }
-
-  // Métodos específicos para suas anotações
-  static TypeChecker get readDefault => createChecker(ReadDefault, 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart');
-
-  static TypeChecker get createDefault => createChecker(CreateDefault, 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart');
-
-  static TypeChecker get updateDefault => createChecker(UpdateDefault, 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart');
-
-  static TypeChecker get jsonConverter => createChecker(JsonConverter, 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart');
-
-  static TypeChecker get jsonPostProcessor => createChecker(JsonPostProcessor, 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart');
-
-  static TypeChecker get allowFieldValue => createChecker(AllowFieldValue, 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart');
-
-  static TypeChecker get alwaysUseFieldValueServerTimestampWhenCreating =>
-      createChecker(AlwaysUseFieldValueServerTimestampWhenCreating, 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart');
-
-  static TypeChecker get alwaysUseFieldValueServerTimestampWhenUpdating =>
-      createChecker(AlwaysUseFieldValueServerTimestampWhenUpdating, 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart');
 }
