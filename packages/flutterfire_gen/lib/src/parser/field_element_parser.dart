@@ -1,6 +1,7 @@
 // ignore_for_file: lines_longer_than_80_chars, deprecated_member_use
 
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../configs/field_config.dart';
@@ -112,42 +113,36 @@ class FieldElementParser {
   /// to extract default values and any JsonConverter configurations.
   ///
   /// Returns a [FieldConfig] that contains parsed configurations.
-  FieldConfig parse(FieldElement element) {
-    final metadata = element.metadata;
-    final readDefaultValueString = metadata.annotations
-        .map(
-          (annotation) => _parseDefaultAnnotation(
-            defaultType: _DefaultType.read,
-            annotation: annotation,
-          ),
-        )
-        .firstWhere((value) => value != null, orElse: () => null);
-    final createDefaultValueString = metadata.annotations
-        .map(
-          (annotation) => _parseDefaultAnnotation(
-            defaultType: _DefaultType.create,
-            annotation: annotation,
-          ),
-        )
-        .firstWhere((value) => value != null, orElse: () => null);
-    final updateDefaultValueString = metadata.annotations
-        .map(
-          (annotation) => _parseDefaultAnnotation(
-            defaultType: _DefaultType.update,
-            annotation: annotation,
-          ),
-        )
-        .firstWhere((value) => value != null, orElse: () => null);
-    final jsonConverterConfig = metadata.annotations.map(_parseJsonConverterAnnotation).firstWhere((value) => value != null, orElse: () => null);
-    final jsonPostProcessorConfig = metadata.annotations.map(_parseJsonPostProcessorAnnotation).firstWhere((value) => value != null, orElse: () => null);
-    final allowFieldValue = metadata.annotations.map(_parseAllowFieldValueAnnotation).firstWhere((value) => value, orElse: () => false);
-    final alwaysUseFieldValueServerTimestampWhenCreating =
-        metadata.annotations.map(_parseAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation).firstWhere((value) => value, orElse: () => false);
-    final alwaysUseFieldValueServerTimestampWhenUpdating =
-        metadata.annotations.map(_parseAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation).firstWhere((value) => value, orElse: () => false);
+  FieldConfig parse(FieldElement2 element) {
+    final metadata = element.metadata2;
 
+    String? readDefaultValueString;
+    String? createDefaultValueString;
+    String? updateDefaultValueString;
+    JsonConverterConfig? jsonConverterConfig;
+    JsonPostProcessorConfig? jsonPostProcessorConfig;
+    var allowFieldValue = false;
+    var alwaysUseFieldValueServerTimestampWhenCreating = false;
+    var alwaysUseFieldValueServerTimestampWhenUpdating = false;
+
+    for (final ann in metadata.annotations) {
+      readDefaultValueString ??= _parseDefaultAnnotation(defaultType: _DefaultType.read, annotation: ann);
+      createDefaultValueString ??= _parseDefaultAnnotation(defaultType: _DefaultType.create, annotation: ann);
+      updateDefaultValueString ??= _parseDefaultAnnotation(defaultType: _DefaultType.update, annotation: ann);
+      jsonConverterConfig ??= _parseJsonConverterAnnotation(ann);
+      jsonPostProcessorConfig ??= _parseJsonPostProcessorAnnotation(ann);
+      if (!allowFieldValue) {
+        allowFieldValue = _parseAllowFieldValueAnnotation(ann);
+      }
+      if (!alwaysUseFieldValueServerTimestampWhenCreating) {
+        alwaysUseFieldValueServerTimestampWhenCreating = _parseAlwaysUseFieldValueServerTimestampWhenCreatingAnnotation(ann);
+      }
+      if (!alwaysUseFieldValueServerTimestampWhenUpdating) {
+        alwaysUseFieldValueServerTimestampWhenUpdating = _parseAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation(ann);
+      }
+    }
     return FieldConfig(
-      name: element.name ?? element.displayName,
+      name: element.displayName,
       dartType: element.type,
       readDefaultValueString: readDefaultValueString,
       createDefaultValueString: createDefaultValueString,

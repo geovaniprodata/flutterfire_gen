@@ -1,4 +1,6 @@
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
+// using analyzer element (stable) APIs
 import 'package:build/build.dart';
 import 'package:flutterfire_gen_annotation/flutterfire_gen_annotation.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -37,30 +39,30 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
 
   @override
   String generateForAnnotatedElement(
-    Element element,
+    Element2 element,
     ConstantReader annotation,
     BuildStep buildStep,
   ) {
-    if (element is! ClassElement) {
+    if (element is! ClassElement2) {
       throw InvalidGenerationSourceError(
         '@FirestoreDocument can only be applied on classes. '
-        'Failing element: ${element.name}',
+        'Failing element: ${element.displayName}',
         element: element,
       );
     }
 
-    if (!element.name.startsWith(_buildYamlConfig.schemaDefinitionClassPrefix)) {
+    if (!element.displayName.startsWith(_buildYamlConfig.schemaDefinitionClassPrefix)) {
       throw InvalidGenerationSourceError(
-        '${element.name} must start with '
+        '${element.displayName} must start with '
         "'${_buildYamlConfig.schemaDefinitionClassPrefix}'. "
         'Because you set schema_definition_class_prefix to '
         "'${_buildYamlConfig.schemaDefinitionClassPrefix}' in build.yaml. "
-        'Failing element: ${element.name}',
+        'Failing element: ${element.displayName}',
         element: element,
       );
     }
 
-    final baseClassName = element.name.replaceFirst(_buildYamlConfig.schemaDefinitionClassPrefix, '');
+    final baseClassName = element.displayName.replaceFirst(_buildYamlConfig.schemaDefinitionClassPrefix, '');
 
     final annotation = const TypeChecker.fromRuntime(FirestoreDocument).firstAnnotationOf(element, throwOnUnresolved: false)!;
 
@@ -71,7 +73,7 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
         decode: (obj) => obj.toStringValue()!,
         orElse: () => throw InvalidGenerationSourceError(
           'path field is required. '
-          'Failing element: ${element.name}',
+          'Failing element: ${element.displayName}',
           element: element,
         ),
       ),
@@ -130,9 +132,9 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
         decode: (obj) => obj.toBoolValue() ?? false,
         orElse: () => _buildYamlConfig.generateCopyWith,
       ),
-      fieldConfigs: element.fields
+      fieldConfigs: element.fields2
           .map(
-            const FieldElementParser(
+            (e) => const FieldElementParser(
               readDefaultTypeChecker: TypeChecker.fromRuntime(ReadDefault),
               createDefaultTypeChecker: TypeChecker.fromRuntime(CreateDefault),
               updateDefaultTypeChecker: TypeChecker.fromRuntime(UpdateDefault),
@@ -145,7 +147,7 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
               alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker: TypeChecker.fromRuntime(
                 AlwaysUseFieldValueServerTimestampWhenUpdating,
               ),
-            ).parse,
+            ).parse(e),
           )
           .toList(),
     );
