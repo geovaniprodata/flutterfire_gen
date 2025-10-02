@@ -76,8 +76,7 @@ class FromJsonFieldParser {
     String parsedKey = 'e',
   }) {
     final hasDefaultValue = (defaultValueString ?? '').isNotEmpty;
-    final defaultValueExpression =
-        (isFirstLoop && hasDefaultValue) ? ' ?? $defaultValueString' : '';
+    final defaultValueExpression = (isFirstLoop && hasDefaultValue) ? ' ?? $defaultValueString' : '';
 
     if (jsonConverterConfig != null) {
       final fromJsonString = '${jsonConverterConfig.jsonConverterString}.'
@@ -91,8 +90,7 @@ class FromJsonFieldParser {
       }
     }
 
-    final effectiveParsedKey =
-        isFirstLoop ? "extendedJson['$name']" : parsedKey;
+    final effectiveParsedKey = isFirstLoop ? "extendedJson['$name']" : parsedKey;
 
     if (dartType.isDartCoreList) {
       if (dartType.firstTypeArgumentOfList != null) {
@@ -146,9 +144,21 @@ class FromJsonFieldParser {
       }
     }
 
+    // NEW: Handle non-primitive types with implicit fromJson()
+    if (!dartType.isPrimitiveType) {
+      final typeNameString = dartType.typeName(forceNullable: false);
+      final baseTypeName = typeNameString.replaceAll('?', '');
+
+      if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
+        return '$effectiveParsedKey == null ? null : '
+            '$baseTypeName.fromJson($effectiveParsedKey as Map<String, dynamic>)';
+      } else {
+        return '$baseTypeName.fromJson($effectiveParsedKey as Map<String, dynamic>)';
+      }
+    }
+
     final typeNameString = dartType.typeName(
-      forceNullable:
-          dartType.isNullableType || defaultValueExpression.isNotEmpty,
+      forceNullable: dartType.isNullableType || defaultValueExpression.isNotEmpty,
     );
     return '$effectiveParsedKey as $typeNameString$defaultValueExpression';
   }

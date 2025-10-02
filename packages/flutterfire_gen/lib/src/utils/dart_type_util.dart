@@ -8,14 +8,38 @@ extension DartTypeExtension on DartType {
   /// Determines whether the DartType is of type `bool`.
   ///
   /// Returns true if the DartType is of type `bool`, otherwise returns false.
-  bool get isDateTimeType =>
-      RegExp(r'^DateTime\??$').firstMatch(typeName()) != null;
+  bool get isDateTimeType => RegExp(r'^DateTime\??$').firstMatch(typeName()) != null;
+
+  /// Determines whether the DartType is a primitive type.
+  ///
+  /// In this context, primitive types are:
+  /// - String
+  /// - num, int, double
+  /// - bool
+  /// - DateTime
+  /// - Map<String, dynamic>
+  /// - List<T> where T is primitive
+  bool get isPrimitiveType {
+    if (this is DynamicType) return true;
+    if (isDartCoreString) return true;
+    if (isDartCoreBool) return true;
+    if (isDartCoreNum || isDartCoreInt || isDartCoreDouble) return true;
+    if (isDateTimeType) return true;
+    if (isJsonMap) return true;
+
+    // For List types, check if element type is primitive
+    if (isDartCoreList) {
+      final elementType = firstTypeArgumentOfList;
+      return elementType?.isPrimitiveType ?? false;
+    }
+
+    return false;
+  }
 
   /// Determines whether the DartType is nullable.
   ///
   /// Returns true if this DartType is nullable, otherwise returns false.
-  bool get isNullableType =>
-      this is DynamicType || nullabilitySuffix == NullabilitySuffix.question;
+  bool get isNullableType => this is DynamicType || nullabilitySuffix == NullabilitySuffix.question;
 
   /// Returns the string representation of the DartType.
   ///
@@ -88,8 +112,7 @@ extension DartTypeExtension on DartType {
     } else if (type is InterfaceType) {
       final code = [
         type.element.name,
-        if (type.typeArguments.isNotEmpty)
-          '<${type.typeArguments.map(_typeToCode).join(', ')}>',
+        if (type.typeArguments.isNotEmpty) '<${type.typeArguments.map(_typeToCode).join(', ')}>',
         if (type.isNullableType || forceNullable) '?' else '',
       ].join();
       if (wrapByFirestoreData) {

@@ -74,9 +74,7 @@ class ToJsonFieldParser {
 
   @override
   String toString() {
-    final assertNonNull = skipIfNull &&
-        (defaultValueString ?? '').isEmpty &&
-        !alwaysUseFieldValueServerTimestamp;
+    final assertNonNull = skipIfNull && (defaultValueString ?? '').isEmpty && !alwaysUseFieldValueServerTimestamp;
     final result = _generateToJsonCodeSnippet(
       dartType: dartType,
       defaultValueString: defaultValueString,
@@ -113,8 +111,7 @@ class ToJsonFieldParser {
     required bool assertNonNull,
   }) {
     final hasDefaultValue = (defaultValueString ?? '').isNotEmpty;
-    final defaultValueExpression =
-        hasDefaultValue ? ' ?? $defaultValueString' : '';
+    final defaultValueExpression = hasDefaultValue ? ' ?? $defaultValueString' : '';
 
     if (isAlwaysUseFieldValueServerTimestamp) {
       return 'FieldValue.serverTimestamp()';
@@ -177,6 +174,20 @@ class ToJsonFieldParser {
         } else {
           return 'Timestamp.fromDate($name)';
         }
+      }
+    }
+
+    // Handle non-primitive types with implicit toJson()
+    // This is the KEY modification - moved BEFORE the primitive type check
+    if (!dartType.isPrimitiveType) {
+      if (dartType.isNullableType) {
+        if (assertNonNull) {
+          return '$name!.toJson()';
+        } else {
+          return '$name?.toJson()';
+        }
+      } else {
+        return '$name.toJson()';
       }
     }
 
