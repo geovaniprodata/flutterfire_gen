@@ -20,14 +20,11 @@ class FromJsonFieldParser {
   /// string.
   /// - [jsonConverterConfig] Configuration for custom JSON conversion of the
   /// field.
-  /// - [ignoreJsonSerialization] Whether to skip fromJson/toJson and call
-  /// constructor directly.
   const FromJsonFieldParser({
     required this.name,
     required this.dartType,
     required this.defaultValueString,
     required this.jsonConverterConfig,
-    required this.ignoreJsonSerialization,
   });
 
   /// The name of the field in the class.
@@ -48,16 +45,12 @@ class FromJsonFieldParser {
   /// of the field from JSON.
   final JsonConverterConfig? jsonConverterConfig;
 
-  /// Whether to ignore JSON serialization and call constructor directly.
-  final bool ignoreJsonSerialization;
-
   @override
   String toString() {
     final result = _generateFromJsonCodeSnippet(
       dartType,
       defaultValueString: defaultValueString,
       jsonConverterConfig: jsonConverterConfig,
-      ignoreJsonSerialization: ignoreJsonSerialization,
       isFirstLoop: true,
     );
     return '$name: $result,';
@@ -71,7 +64,6 @@ class FromJsonFieldParser {
   /// - [dartType] The type of the field to be deserialized.
   /// - [defaultValueString] A default value for the field, if any.
   /// - [jsonConverterConfig] Configuration for custom JSON conversion.
-  /// - [ignoreJsonSerialization] Whether to skip JSON serialization.
   /// - [isFirstLoop] A flag to indicate whether this is the first recursive
   /// call.
   /// - [parsedKey] The key used in parsing, useful in recursion for nested
@@ -81,7 +73,6 @@ class FromJsonFieldParser {
     required bool isFirstLoop,
     String? defaultValueString,
     JsonConverterConfig? jsonConverterConfig,
-    bool ignoreJsonSerialization = false,
     String parsedKey = 'e',
   }) {
     final hasDefaultValue = (defaultValueString ?? '').isNotEmpty;
@@ -107,7 +98,6 @@ class FromJsonFieldParser {
         final parsedListItemType = _generateFromJsonCodeSnippet(
           listItemType,
           defaultValueString: defaultValueString,
-          ignoreJsonSerialization: ignoreJsonSerialization,
           isFirstLoop: false,
         );
         if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
@@ -138,11 +128,10 @@ class FromJsonFieldParser {
             }
           }
 
-          // Value is not dynamic, need to process it
+          // Value is not dynamic, need to process it recursively
           final parsedMapValueType = _generateFromJsonCodeSnippet(
             valueType,
             defaultValueString: defaultValueString,
-            ignoreJsonSerialization: ignoreJsonSerialization,
             isFirstLoop: false,
             parsedKey: 'v',
           );
@@ -166,21 +155,25 @@ class FromJsonFieldParser {
       }
     }
 
-    // Handle non-primitive types
+    // Handle Enums
+    if (dartType.isEnumType) {
+      final typeNameString = dartType.typeName(forceNullable: false);
+      final baseTypeName = typeNameString.replaceAll('?', '');
+
+      if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
+        return '$effectiveParsedKey == null ? null : '
+            '$baseTypeName.values.byName($effectiveParsedKey as String)';
+      } else {
+        return '$baseTypeName.values.byName($effectiveParsedKey as String)';
+      }
+    }
+
+    // Handle non-primitive types with fromJson
+    // This mimics json_serializable's explicitToJson behavior
     if (!dartType.isPrimitiveType) {
       final typeNameString = dartType.typeName(forceNullable: false);
       final baseTypeName = typeNameString.replaceAll('?', '');
 
-      // If ignoreJsonSerialization is true, call constructor directly
-      if (ignoreJsonSerialization) {
-        if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
-          return '$effectiveParsedKey == null ? null : $baseTypeName()';
-        } else {
-          return '$baseTypeName()';
-        }
-      }
-
-      // Otherwise use fromJson
       if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
         return '$effectiveParsedKey == null ? null : '
             '$baseTypeName.fromJson($effectiveParsedKey as Map<String, dynamic>)';

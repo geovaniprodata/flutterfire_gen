@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
@@ -5,10 +6,21 @@ import 'package:analyzer/dart/element/type.dart';
 ///
 /// Provides a set of utility methods and properties related to DartType.
 extension DartTypeExtension on DartType {
-  /// Determines whether the DartType is of type `bool`.
+  /// Determines whether the DartType is of type `DateTime`.
   ///
-  /// Returns true if the DartType is of type `bool`, otherwise returns false.
+  /// Returns true if the DartType is of type `DateTime`, otherwise returns false.
   bool get isDateTimeType => RegExp(r'^DateTime\??$').firstMatch(typeName()) != null;
+
+  /// Determines whether the DartType is an Enum.
+  ///
+  /// Returns true if the DartType is an enum, otherwise returns false.
+  bool get isEnumType {
+    if (this is InterfaceType) {
+      final element = (this as InterfaceType).element;
+      return element is EnumElement;
+    }
+    return false;
+  }
 
   /// Determines whether the DartType is a primitive type.
   ///
@@ -19,12 +31,14 @@ extension DartTypeExtension on DartType {
   /// - DateTime
   /// - Map<String, dynamic>
   /// - List<T> where T is primitive
+  /// - Enums (they serialize to String)
   bool get isPrimitiveType {
     if (this is DynamicType) return true;
     if (isDartCoreString) return true;
     if (isDartCoreBool) return true;
     if (isDartCoreNum || isDartCoreInt || isDartCoreDouble) return true;
     if (isDateTimeType) return true;
+    if (isEnumType) return true;
     if (isJsonMap) return true;
 
     // For List types, check if element type is primitive
