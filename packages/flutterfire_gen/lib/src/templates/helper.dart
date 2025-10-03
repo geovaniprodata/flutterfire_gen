@@ -22,6 +22,94 @@ class TemplateFieldHelper {
 // EXEMPLO DE USO NOS TEMPLATES:
 
 // ============================================
+// read_class_template.dart (CRITICAL FIX)
+// ============================================
+/*
+class ReadClassTemplate {
+  final CodeGenerationConfig config;
+  
+  String generate() {
+    final buffer = StringBuffer();
+    
+    // IMPORTANTE: Filtrar campos ignorados do fromJson
+    final fieldsForFromJson = config.fieldConfigs
+        .where((field) => !field.ignoreJsonSerialization) // ✅ Filtra @IgnoreJsonSerialization
+        .toList();
+    
+    // Factory fromJson - usar apenas fieldsForFromJson
+    buffer.writeln('factory ${config.readClassName}.fromJson(Map<String, dynamic> json) {');
+    buffer.writeln('  final extendedJson = json;');
+    buffer.writeln('  return ${config.readClassName}(');
+    
+    for (final field in fieldsForFromJson) {
+      // Gerar código de desserialização usando FromJsonFieldParser
+      buffer.writeln('    // ${field.name}');
+    }
+    
+    buffer.writeln('  );');
+    buffer.writeln('}');
+    
+    return buffer.toString();
+  }
+}
+*/
+
+// ============================================
+// EXEMPLO COMPLETO: Read Class com Filtro
+// ============================================
+
+String generateReadClass(CodeGenerationConfig config) {
+  // Campos ignorados NÃO devem estar no fromJson
+  final fieldsForFromJson = config.fieldConfigs.where((field) => !field.ignoreJsonSerialization).toList();
+
+  // Mas TODOS os campos devem estar na classe
+  final allFields = config.fieldConfigs;
+
+  final buffer = StringBuffer()
+    ..writeln('class ${config.readClassName} {')
+    ..writeln('  const ${config.readClassName}({');
+
+  // Constructor parameters (TODOS os campos, incluindo ignorados)
+  for (final field in allFields) {
+    if (field.readDefaultValueString != null) {
+      buffer.writeln('    this.${field.name} = ${field.readDefaultValueString},');
+    } else {
+      buffer.writeln('    required this.${field.name},');
+    }
+  }
+
+  buffer
+    ..writeln('  });')
+    ..writeln();
+
+  // Factory fromJson (APENAS campos não-ignorados)
+  buffer
+    ..writeln('  factory ${config.readClassName}.fromJson(Map<String, dynamic> json) {')
+    ..writeln('    final extendedJson = json;')
+    ..writeln('    return ${config.readClassName}(');
+
+  for (final field in fieldsForFromJson) {
+    // ✅ Filtra ignorados
+    // Gerar código usando FromJsonFieldParser
+    buffer.writeln('      // ${field.name}: ...,');
+  }
+
+  buffer
+    ..writeln('    );')
+    ..writeln('  }')
+    ..writeln();
+
+  // Fields (TODOS, incluindo ignorados)
+  for (final field in allFields) {
+    buffer.writeln('  final ${field.typeName()} ${field.name};');
+  }
+
+  buffer.writeln('}');
+
+  return buffer.toString();
+}
+
+// ============================================
 // create_class_template.dart (ANTES)
 // ============================================
 /*
@@ -163,51 +251,53 @@ String generateUpdateClass(CodeGenerationConfig config) {
 // EXEMPLO COMPLETO: Read Class
 // ============================================
 
-String generateReadClass(CodeGenerationConfig config) {
-  // Read class inclui TODOS os campos (mesmo os @IgnoreJsonSerialization)
-  // Pois getters computados ainda devem aparecer na classe de leitura
-  final allFields = config.fieldConfigs;
+// String generateReadClass(CodeGenerationConfig config) {
+//   // Read class inclui TODOS os campos (mesmo os @IgnoreJsonSerialization)
+//   // Pois getters computados ainda devem aparecer na classe de leitura
+//   final allFields = config.fieldConfigs;
 
-  final buffer = StringBuffer()
-    ..writeln('class ${config.readClassName} {')
-    ..writeln('  const ${config.readClassName}({');
+//   final buffer = StringBuffer()
+//     ..writeln('class ${config.readClassName} {')
+//     ..writeln('  const ${config.readClassName}({');
 
-  // Constructor parameters
-  for (final field in allFields) {
-    if (field.readDefaultValueString != null) {
-      buffer.writeln('    this.${field.name} = ${field.readDefaultValueString},');
-    } else {
-      buffer.writeln('    required this.${field.name},');
-    }
-  }
+//   // Constructor parameters
+//   for (final field in allFields) {
+//     if (field.readDefaultValueString != null) {
+//       buffer.writeln('    this.${field.name} = ${field.readDefaultValueString},');
+//     } else {
+//       buffer.writeln('    required this.${field.name},');
+//     }
+//   }
 
-  buffer
-    ..writeln('  });')
-    ..writeln();
+//   buffer
+//     ..writeln('  });')
+//     ..writeln();
 
-  // Factory fromJson
-  buffer
-    ..writeln('  factory ${config.readClassName}.fromJson(Map<String, dynamic> json) {')
-    ..writeln('    return ${config.readClassName}(');
+//   // Factory fromJson
+//   buffer
+//     ..writeln('  factory ${config.readClassName}.fromJson(Map<String, dynamic> json) {')
+//     ..writeln('    return ${config.readClassName}(');
 
-  // fromJson apenas para campos não-ignorados
-  final writeFields = allFields.where((field) => !field.ignoreJsonSerialization).toList();
+//   // fromJson apenas para campos não-ignorados
+//   final writeFields = allFields
+//       .where((field) => !field.ignoreJsonSerialization)
+//       .toList();
 
-  for (final field in writeFields) {
-    buffer.writeln('      // Desserialização para ${field.name}');
-  }
+//   for (final field in writeFields) {
+//     buffer.writeln('      // Desserialização para ${field.name}');
+//   }
 
-  buffer
-    ..writeln('    );')
-    ..writeln('  }')
-    ..writeln();
+//   buffer
+//     ..writeln('    );')
+//     ..writeln('  }')
+//     ..writeln();
 
-  // Fields
-  for (final field in allFields) {
-    buffer.writeln('  final ${field.typeName()} ${field.name};');
-  }
+//   // Fields
+//   for (final field in allFields) {
+//     buffer.writeln('  final ${field.typeName()} ${field.name};');
+//   }
 
-  buffer.writeln('}');
+//   buffer.writeln('}');
 
-  return buffer.toString();
-}
+//   return buffer.toString();
+// }

@@ -177,8 +177,105 @@ class ToJsonFieldParser {
       }
     }
 
+    // Handle Enums - they serialize to their name string
+    if (dartType.isEnumType) {
+      if (dartType.isNullableType) {
+        if (assertNonNull) {
+          return '$name!.name';
+        } else {
+          return '$name?.name';
+        }
+      } else {
+        return '$name.name';
+      }
+    }
+
+    // Handle Lists with non-primitive types
+    // This mimics json_serializable's explicitToJson behavior
+    if (dartType.isDartCoreList) {
+      final listItemType = dartType.firstTypeArgumentOfList;
+      if (listItemType != null && !listItemType.isPrimitiveType && !listItemType.isEnumType) {
+        if (dartType.isNullableType) {
+          if (assertNonNull) {
+            return '$name!.map((e) => e.toJson()).toList()';
+          } else {
+            return '$name?.map((e) => e.toJson()).toList()';
+          }
+        } else {
+          return '$name.map((e) => e.toJson()).toList()';
+        }
+      }
+    }
+
+    // Handle Maps with non-primitive values or enum keys
+    // This mimics json_serializable's explicitToJson behavior
+    if (dartType.isDartCoreMap) {
+      final keyValueTypes = dartType.keyValueOfMap;
+      if (keyValueTypes != null) {
+        final keyType = keyValueTypes.key;
+        final valueType = keyValueTypes.value;
+
+        // Handle Map with Enum keys (e.g., Map<MarketplacesEnum, bool>)
+        if (keyType.isEnumType) {
+          // Serialize enum keys to their name (String)
+          if (valueType.isPrimitiveType || valueType is DynamicType) {
+            // Map<EnumType, primitive> - just convert keys to names
+            if (dartType.isNullableType) {
+              if (assertNonNull) {
+                return '$name!.map((k, v) => MapEntry(k.name, v))';
+              } else {
+                return '$name?.map((k, v) => MapEntry(k.name, v))';
+              }
+            } else {
+              return '$name.map((k, v) => MapEntry(k.name, v))';
+            }
+          } else {
+            // Map<EnumType, ComplexType> - convert keys to names and values to JSON
+            if (dartType.isNullableType) {
+              if (assertNonNull) {
+                return '$name!.map((k, v) => MapEntry(k.name, v.toJson()))';
+              } else {
+                return '$name?.map((k, v) => MapEntry(k.name, v.toJson()))';
+              }
+            } else {
+              return '$name.map((k, v) => MapEntry(k.name, v.toJson()))';
+            }
+          }
+        }
+
+        // Handle Map with String keys and non-primitive values
+        if (keyType.isDartCoreString) {
+          // If value is not primitive, not dynamic, and not enum, need to call toJson on values
+          if (!valueType.isPrimitiveType && valueType is! DynamicType && !valueType.isEnumType) {
+            if (dartType.isNullableType) {
+              if (assertNonNull) {
+                return '$name!.map((k, v) => MapEntry(k, v.toJson()))';
+              } else {
+                return '$name?.map((k, v) => MapEntry(k, v.toJson()))';
+              }
+            } else {
+              return '$name.map((k, v) => MapEntry(k, v.toJson()))';
+            }
+          }
+
+          // If value is enum, convert to name
+          if (valueType.isEnumType) {
+            if (dartType.isNullableType) {
+              if (assertNonNull) {
+                return '$name!.map((k, v) => MapEntry(k, v.name))';
+              } else {
+                return '$name?.map((k, v) => MapEntry(k, v.name))';
+              }
+            } else {
+              return '$name.map((k, v) => MapEntry(k, v.name))';
+            }
+          }
+        }
+      }
+    }
+
     // Handle non-primitive types with implicit toJson()
-    // This is the KEY modification - moved BEFORE the primitive type check
+    // This mimics json_serializable's explicitToJson behavior
     if (!dartType.isPrimitiveType) {
       if (dartType.isNullableType) {
         if (assertNonNull) {

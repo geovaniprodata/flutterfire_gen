@@ -88,17 +88,17 @@ extension DartTypeExtension on DartType {
       if (key == null || value == null) {
         return false;
       }
-      return key.isDartCoreString;
+      // Only Map<String, dynamic> is considered JsonMap
+      return key.isDartCoreString && value is DynamicType;
     }
     return false;
   }
 
-  /// If the DartType is a JsonMap, returns its key and value DartType as a
-  /// Record.
+  /// If the DartType is a Map, returns its key and value DartType as a Record.
   ///
-  /// Returns null if the DartType is not a JsonMap.
+  /// Returns null if the DartType is not a Map.
   ({DartType key, DartType value})? get keyValueOfMap {
-    if (isJsonMap) {
+    if (isDartCoreMap) {
       final arguments = (this as InterfaceType).typeArguments;
       final key = arguments.elementAtOrNull(0);
       final value = arguments.elementAtOrNull(1);

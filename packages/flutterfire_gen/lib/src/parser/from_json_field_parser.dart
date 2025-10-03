@@ -146,6 +146,43 @@ class FromJsonFieldParser {
                 'MapEntry(k, $parsedMapValueType))';
           }
         }
+
+        // Handle Map with Enum keys (e.g., Map<MarketplacesEnum, bool>)
+        if (keyType.isEnumType) {
+          final keyTypeName = keyType.typeName(forceNullable: false).replaceAll('?', '');
+
+          // Check if value is dynamic or primitive
+          if (valueType is DynamicType || valueType.isPrimitiveType) {
+            // Map<EnumType, primitive> - convert string keys to enum
+            final valueTypeString = valueType.typeName(forceNullable: false);
+
+            if (dartType.isNullableType || hasDefaultValue) {
+              final fallback = hasDefaultValue ? ' ?? $defaultValueString' : '';
+              return '($effectiveParsedKey as Map<String, dynamic>?)?.map((k, v) '
+                  '=> MapEntry($keyTypeName.values.byName(k), v as $valueTypeString))$fallback';
+            } else {
+              return '($effectiveParsedKey as Map<String, dynamic>).map((k, v) => '
+                  'MapEntry($keyTypeName.values.byName(k), v as $valueTypeString))';
+            }
+          } else {
+            // Map<EnumType, ComplexType> - convert both key and value
+            final parsedMapValueType = _generateFromJsonCodeSnippet(
+              valueType,
+              defaultValueString: null,
+              isFirstLoop: false,
+              parsedKey: 'v',
+            );
+
+            if (dartType.isNullableType || hasDefaultValue) {
+              final fallback = hasDefaultValue ? ' ?? $defaultValueString' : '';
+              return '($effectiveParsedKey as Map<String, dynamic>?)?.map((k, v) '
+                  '=> MapEntry($keyTypeName.values.byName(k), $parsedMapValueType))$fallback';
+            } else {
+              return '($effectiveParsedKey as Map<String, dynamic>).map((k, v) => '
+                  'MapEntry($keyTypeName.values.byName(k), $parsedMapValueType))';
+            }
+          }
+        }
       }
     }
 
