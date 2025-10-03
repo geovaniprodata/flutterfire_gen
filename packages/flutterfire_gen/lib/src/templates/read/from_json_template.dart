@@ -16,8 +16,7 @@ class FromJsonTemplate {
 
   @override
   String toString() {
-    final jsonPostProcessors =
-        JsonPostProcessorTemplate.fromJson(config.fieldConfigs);
+    final jsonPostProcessors = JsonPostProcessorTemplate.fromJson(config.fieldConfigs);
     final additionalFields = [
       "${config.documentId}: extendedJson['${config.documentId}'] as String,",
       if (config.includePathField) "path: extendedJson['path'] as String,",
@@ -46,6 +45,7 @@ factory ${config.readClassName}.fromJson(Map<String, dynamic> json) {
         dartType: fieldConfig.dartType,
         defaultValueString: fieldConfig.readDefaultValueString,
         jsonConverterConfig: fieldConfig.jsonConverterConfig,
+        ignoreJsonSerialization: fieldConfig.ignoreJsonSerialization,
       );
       stringBuffer.writeln(result);
     }
