@@ -45,7 +45,6 @@ factory ${config.readClassName}.fromJson(Map<String, dynamic> json) {
         dartType: fieldConfig.dartType,
         defaultValueString: fieldConfig.readDefaultValueString,
         jsonConverterConfig: fieldConfig.jsonConverterConfig,
-        ignoreJsonSerialization: fieldConfig.ignoreJsonSerialization,
       );
       stringBuffer.writeln(result);
     }
