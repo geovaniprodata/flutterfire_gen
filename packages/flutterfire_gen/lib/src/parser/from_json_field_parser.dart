@@ -20,11 +20,14 @@ class FromJsonFieldParser {
   /// string.
   /// - [jsonConverterConfig] Configuration for custom JSON conversion of the
   /// field.
+  /// - [ignoreJsonSerialization] Whether to skip fromJson/toJson and call
+  /// constructor directly.
   const FromJsonFieldParser({
     required this.name,
     required this.dartType,
     required this.defaultValueString,
     required this.jsonConverterConfig,
+    required this.ignoreJsonSerialization,
   });
 
   /// The name of the field in the class.
@@ -45,12 +48,16 @@ class FromJsonFieldParser {
   /// of the field from JSON.
   final JsonConverterConfig? jsonConverterConfig;
 
+  /// Whether to ignore JSON serialization and call constructor directly.
+  final bool ignoreJsonSerialization;
+
   @override
   String toString() {
     final result = _generateFromJsonCodeSnippet(
       dartType,
       defaultValueString: defaultValueString,
       jsonConverterConfig: jsonConverterConfig,
+      ignoreJsonSerialization: ignoreJsonSerialization,
       isFirstLoop: true,
     );
     return '$name: $result,';
@@ -64,6 +71,7 @@ class FromJsonFieldParser {
   /// - [dartType] The type of the field to be deserialized.
   /// - [defaultValueString] A default value for the field, if any.
   /// - [jsonConverterConfig] Configuration for custom JSON conversion.
+  /// - [ignoreJsonSerialization] Whether to skip JSON serialization.
   /// - [isFirstLoop] A flag to indicate whether this is the first recursive
   /// call.
   /// - [parsedKey] The key used in parsing, useful in recursion for nested
@@ -73,6 +81,7 @@ class FromJsonFieldParser {
     required bool isFirstLoop,
     String? defaultValueString,
     JsonConverterConfig? jsonConverterConfig,
+    bool ignoreJsonSerialization = false,
     String parsedKey = 'e',
   }) {
     final hasDefaultValue = (defaultValueString ?? '').isNotEmpty;
@@ -94,9 +103,11 @@ class FromJsonFieldParser {
 
     if (dartType.isDartCoreList) {
       if (dartType.firstTypeArgumentOfList != null) {
+        final listItemType = dartType.firstTypeArgumentOfList!;
         final parsedListItemType = _generateFromJsonCodeSnippet(
-          dartType.firstTypeArgumentOfList!,
+          listItemType,
           defaultValueString: defaultValueString,
+          ignoreJsonSerialization: ignoreJsonSerialization,
           isFirstLoop: false,
         );
         if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
@@ -109,29 +120,40 @@ class FromJsonFieldParser {
       }
     }
 
-    if (dartType.isJsonMap) {
-      if (dartType.keyValueOfMap != null) {
-        final valueType = dartType.keyValueOfMap!.value;
-        if (valueType is DynamicType) {
-          if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
-            return '$effectiveParsedKey '
-                'as Map<String, dynamic>?$defaultValueExpression';
-          } else {
-            return '$effectiveParsedKey as Map<String, dynamic>';
+    if (dartType.isDartCoreMap) {
+      final keyValueTypes = dartType.keyValueOfMap;
+      if (keyValueTypes != null) {
+        final keyType = keyValueTypes.key;
+        final valueType = keyValueTypes.value;
+
+        // Check if key is String (required for JSON maps)
+        if (keyType.isDartCoreString) {
+          // Check if value is dynamic
+          if (valueType is DynamicType) {
+            if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
+              return '$effectiveParsedKey '
+                  'as Map<String, dynamic>?$defaultValueExpression';
+            } else {
+              return '$effectiveParsedKey as Map<String, dynamic>';
+            }
           }
-        }
-        final parsedMapValueType = _generateFromJsonCodeSnippet(
-          valueType,
-          defaultValueString: defaultValueString,
-          isFirstLoop: false,
-          parsedKey: 'v',
-        );
-        if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
-          return '($effectiveParsedKey as Map<String, dynamic>?)?.map((k, v) '
-              '=> MapEntry(k, $parsedMapValueType))$defaultValueExpression';
-        } else {
-          return '($effectiveParsedKey as Map<String, dynamic>).map((k, v) => '
-              'MapEntry(k, $parsedMapValueType))$defaultValueExpression';
+
+          // Value is not dynamic, need to process it
+          final parsedMapValueType = _generateFromJsonCodeSnippet(
+            valueType,
+            defaultValueString: defaultValueString,
+            ignoreJsonSerialization: ignoreJsonSerialization,
+            isFirstLoop: false,
+            parsedKey: 'v',
+          );
+
+          if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
+            return '($effectiveParsedKey as Map<String, dynamic>?)?.map((k, v) '
+                '=> MapEntry(k, $parsedMapValueType))$defaultValueExpression';
+          } else {
+            return '($effectiveParsedKey as Map<String, dynamic>).map((k, v) => '
+                'MapEntry(k, $parsedMapValueType))$defaultValueExpression';
+          }
         }
       }
     }
@@ -144,11 +166,21 @@ class FromJsonFieldParser {
       }
     }
 
-    // NEW: Handle non-primitive types with implicit fromJson()
+    // Handle non-primitive types
     if (!dartType.isPrimitiveType) {
       final typeNameString = dartType.typeName(forceNullable: false);
       final baseTypeName = typeNameString.replaceAll('?', '');
 
+      // If ignoreJsonSerialization is true, call constructor directly
+      if (ignoreJsonSerialization) {
+        if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
+          return '$effectiveParsedKey == null ? null : $baseTypeName()';
+        } else {
+          return '$baseTypeName()';
+        }
+      }
+
+      // Otherwise use fromJson
       if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
         return '$effectiveParsedKey == null ? null : '
             '$baseTypeName.fromJson($effectiveParsedKey as Map<String, dynamic>)';

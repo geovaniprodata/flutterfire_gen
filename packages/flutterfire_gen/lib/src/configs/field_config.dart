@@ -31,6 +31,8 @@ class FieldConfig {
   /// `FieldValue.serverTimestamp()` when creating.
   /// - [alwaysUseFieldValueServerTimestampWhenUpdating] Whether to always use
   /// `FieldValue.serverTimestamp()` when updating.
+  /// - [ignoreJsonSerialization] Whether to skip fromJson/toJson and call
+  /// constructor/use value directly.
   FieldConfig({
     required this.name,
     required this.dartType,
@@ -42,6 +44,7 @@ class FieldConfig {
     this.allowFieldValue = false,
     this.alwaysUseFieldValueServerTimestampWhenCreating = false,
     this.alwaysUseFieldValueServerTimestampWhenUpdating = false,
+    this.ignoreJsonSerialization = false,
   });
 
   /// The name of the field.
@@ -121,4 +124,10 @@ class FieldConfig {
   /// Set to `true` to enforce that the field's value is updated to the server's
   /// timestamp during document update operations.
   final bool alwaysUseFieldValueServerTimestampWhenUpdating;
+
+  /// Whether to ignore JSON serialization (fromJson/toJson) and use constructor/value directly.
+  ///
+  /// Set to `true` to skip automatic fromJson/toJson calls for non-primitive types.
+  /// Useful for classes that don't need serialization (e.g., AuditoriaActions()).
+  final bool ignoreJsonSerialization;
 }

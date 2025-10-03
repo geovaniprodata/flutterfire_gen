@@ -46,6 +46,9 @@ class FieldElementParser {
   /// [TypeChecker] for `AlwaysUseFieldValueServerTimestampWhenUpdating`
   /// annotations, enforcing `FieldValue.serverTimestamp` during updates, if
   /// not null.
+  /// - [ignoreJsonSerializationTypeChecker] A nullable [TypeChecker] for
+  /// `IgnoreJsonSerialization` annotations, to skip fromJson/toJson and call
+  /// constructor directly, if not null.
   const FieldElementParser({
     required this.readDefaultTypeChecker,
     required this.createDefaultTypeChecker,
@@ -55,6 +58,7 @@ class FieldElementParser {
     required this.allowFieldValueTypeChecker,
     required this.alwaysUseFieldValueServerTimestampWhenCreatingTypeChecker,
     required this.alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker,
+    required this.ignoreJsonSerializationTypeChecker,
   });
 
   /// [TypeChecker] for identifying `ReadDefault` annotations.
@@ -100,6 +104,10 @@ class FieldElementParser {
   /// when updating instances.
   final TypeChecker? alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker;
 
+  /// [TypeChecker] for identifying `IgnoreJsonSerialization` annotations.
+  /// This is used to skip fromJson/toJson calls and use constructor/value directly.
+  final TypeChecker? ignoreJsonSerializationTypeChecker;
+
   TypeChecker? _defaultTypeChecker(_DefaultType defaultType) {
     return switch (defaultType) {
       _DefaultType.read => readDefaultTypeChecker,
@@ -124,6 +132,7 @@ class FieldElementParser {
     var allowFieldValue = false;
     var alwaysUseFieldValueServerTimestampWhenCreating = false;
     var alwaysUseFieldValueServerTimestampWhenUpdating = false;
+    var ignoreJsonSerialization = false;
 
     for (final ann in metadata.annotations) {
       readDefaultValueString ??= _parseDefaultAnnotation(defaultType: _DefaultType.read, annotation: ann);
@@ -140,6 +149,9 @@ class FieldElementParser {
       if (!alwaysUseFieldValueServerTimestampWhenUpdating) {
         alwaysUseFieldValueServerTimestampWhenUpdating = _parseAlwaysUseFieldValueServerTimestampWhenUpdatingAnnotation(ann);
       }
+      if (!ignoreJsonSerialization) {
+        ignoreJsonSerialization = _parseIgnoreJsonSerializationAnnotation(ann);
+      }
     }
     return FieldConfig(
       name: element.displayName,
@@ -152,6 +164,7 @@ class FieldElementParser {
       allowFieldValue: allowFieldValue,
       alwaysUseFieldValueServerTimestampWhenCreating: alwaysUseFieldValueServerTimestampWhenCreating,
       alwaysUseFieldValueServerTimestampWhenUpdating: alwaysUseFieldValueServerTimestampWhenUpdating,
+      ignoreJsonSerialization: ignoreJsonSerialization,
     );
   }
 
@@ -296,6 +309,11 @@ class FieldElementParser {
       _parseBoolTypeAnnotation(
         annotation: annotation,
         typeChecker: alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker,
+      );
+
+  bool _parseIgnoreJsonSerializationAnnotation(ElementAnnotation annotation) => _parseBoolTypeAnnotation(
+        annotation: annotation,
+        typeChecker: ignoreJsonSerializationTypeChecker,
       );
 
   bool _parseBoolTypeAnnotation({

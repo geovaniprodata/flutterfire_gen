@@ -147,6 +147,9 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
               alwaysUseFieldValueServerTimestampWhenUpdatingTypeChecker: TypeChecker.fromRuntime(
                 AlwaysUseFieldValueServerTimestampWhenUpdating,
               ),
+              ignoreJsonSerializationTypeChecker: TypeChecker.fromRuntime(
+                IgnoreJsonSerialization,
+              ),
             ).parse(e),
           )
           .toList(),
