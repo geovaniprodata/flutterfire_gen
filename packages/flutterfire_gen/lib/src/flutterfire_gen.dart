@@ -150,7 +150,7 @@ class FlutterFireGen extends GeneratorForAnnotation<FirestoreDocument> {
               ignoreJsonSerializationTypeChecker: TypeChecker.fromRuntime(
                 IgnoreJsonSerialization,
               ),
-            ).parse(e),
+            ).parse(e, classElement: element),
           )
           .toList(),
     );

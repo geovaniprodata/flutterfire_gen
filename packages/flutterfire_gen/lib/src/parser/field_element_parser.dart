@@ -120,8 +120,10 @@ class FieldElementParser {
   /// This function examines the metadata annotations of the [FieldElement]
   /// to extract default values and any JsonConverter configurations.
   ///
+  /// It also checks the constructor for default values if no annotation is present.
+  ///
   /// Returns a [FieldConfig] that contains parsed configurations.
-  FieldConfig parse(FieldElement2 element) {
+  FieldConfig parse(FieldElement2 element, {ClassElement2? classElement}) {
     final metadata = element.metadata2;
 
     String? readDefaultValueString;
@@ -153,6 +155,13 @@ class FieldElementParser {
         ignoreJsonSerialization = _parseIgnoreJsonSerializationAnnotation(ann);
       }
     }
+
+    // If no annotation default found, try to get constructor default
+    if (classElement != null) {
+      readDefaultValueString ??= _getConstructorDefaultValue(classElement, element.displayName);
+      createDefaultValueString ??= _getConstructorDefaultValue(classElement, element.displayName);
+    }
+
     return FieldConfig(
       name: element.displayName,
       dartType: element.type,
@@ -166,6 +175,34 @@ class FieldElementParser {
       alwaysUseFieldValueServerTimestampWhenUpdating: alwaysUseFieldValueServerTimestampWhenUpdating,
       ignoreJsonSerialization: ignoreJsonSerialization,
     );
+  }
+
+  /// Gets the default value from the constructor parameter if it exists.
+  String? _getConstructorDefaultValue(
+    ClassElement2 classElement,
+    String fieldName,
+  ) {
+    try {
+      // Find the unnamed (default) constructor
+      final constructor = classElement.constructors2.firstWhere(
+        (c) => c.name3 == null || c.name3!.isEmpty,
+        orElse: () => throw StateError('No default constructor'),
+      );
+
+      // Find the parameter for this field
+      for (final param in constructor.formalParameters) {
+        if (param.name3 == fieldName) {
+          final defaultValueCode = param.defaultValueCode;
+          if (defaultValueCode != null && defaultValueCode.isNotEmpty) {
+            return defaultValueCode;
+          }
+        }
+      }
+    } catch (e) {
+      // No constructor or parameter found, return null
+    }
+
+    return null;
   }
 
   String? _parseDefaultAnnotation({
