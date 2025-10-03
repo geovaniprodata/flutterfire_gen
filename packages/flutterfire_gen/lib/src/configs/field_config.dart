@@ -31,8 +31,8 @@ class FieldConfig {
   /// `FieldValue.serverTimestamp()` when creating.
   /// - [alwaysUseFieldValueServerTimestampWhenUpdating] Whether to always use
   /// `FieldValue.serverTimestamp()` when updating.
-  /// - [ignoreJsonSerialization] Whether to skip fromJson/toJson and call
-  /// constructor/use value directly.
+  /// - [ignoreJsonSerialization] Whether to completely ignore this field
+  /// during code generation (useful for getters and computed properties).
   FieldConfig({
     required this.name,
     required this.dartType,
@@ -125,9 +125,21 @@ class FieldConfig {
   /// timestamp during document update operations.
   final bool alwaysUseFieldValueServerTimestampWhenUpdating;
 
-  /// Whether to ignore JSON serialization (fromJson/toJson) and use constructor/value directly.
+  /// Whether to completely ignore this field during code generation.
   ///
-  /// Set to `true` to skip automatic fromJson/toJson calls for non-primitive types.
-  /// Useful for classes that don't need serialization (e.g., AuditoriaActions()).
+  /// Set to `true` to exclude this field from Create, Update, and Delete classes.
+  /// This is useful for:
+  /// - Getters that shouldn't be in constructor parameters
+  /// - Computed properties
+  /// - Fields that only make sense in the Read class
+  ///
+  /// Note: The field will still appear in the Read class if it's a valid field.
   final bool ignoreJsonSerialization;
+
+  /// Returns true if this field should be included in Create/Update/Delete classes.
+  bool get shouldIncludeInWriteClasses => !ignoreJsonSerialization;
+
+  /// Returns true if this field should be included in the Read class.
+  /// Currently always returns true as Read class includes all fields.
+  bool get shouldIncludeInReadClass => true;
 }
