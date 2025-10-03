@@ -76,13 +76,12 @@ class FromJsonFieldParser {
     String parsedKey = 'e',
   }) {
     final hasDefaultValue = (defaultValueString ?? '').isNotEmpty;
-    final defaultValueExpression = (isFirstLoop && hasDefaultValue) ? ' ?? $defaultValueString' : '';
 
     if (jsonConverterConfig != null) {
       final fromJsonString = '${jsonConverterConfig.jsonConverterString}.'
           "fromJson(extendedJson['$name']"
           ' as ${jsonConverterConfig.firestoreTypeString})';
-      if (defaultValueString != null) {
+      if (hasDefaultValue) {
         return "extendedJson['$name'] == null "
             '? $defaultValueString : $fromJsonString';
       } else {
@@ -97,12 +96,13 @@ class FromJsonFieldParser {
         final listItemType = dartType.firstTypeArgumentOfList!;
         final parsedListItemType = _generateFromJsonCodeSnippet(
           listItemType,
-          defaultValueString: defaultValueString,
+          defaultValueString: null, // Don't pass default to nested items
           isFirstLoop: false,
         );
-        if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
+        if (dartType.isNullableType || hasDefaultValue) {
+          final fallback = hasDefaultValue ? ' ?? $defaultValueString' : '';
           return '($effectiveParsedKey as List<dynamic>?)?.map((e) '
-              '=> $parsedListItemType).toList()$defaultValueExpression';
+              '=> $parsedListItemType).toList()$fallback';
         } else {
           return '($effectiveParsedKey as List<dynamic>).map((e) '
               '=> $parsedListItemType).toList()';
@@ -120,9 +120,10 @@ class FromJsonFieldParser {
         if (keyType.isDartCoreString) {
           // Check if value is dynamic
           if (valueType is DynamicType) {
-            if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
+            if (dartType.isNullableType || hasDefaultValue) {
+              final fallback = hasDefaultValue ? ' ?? $defaultValueString' : '';
               return '$effectiveParsedKey '
-                  'as Map<String, dynamic>?$defaultValueExpression';
+                  'as Map<String, dynamic>?$fallback';
             } else {
               return '$effectiveParsedKey as Map<String, dynamic>';
             }
@@ -131,17 +132,18 @@ class FromJsonFieldParser {
           // Value is not dynamic, need to process it recursively
           final parsedMapValueType = _generateFromJsonCodeSnippet(
             valueType,
-            defaultValueString: defaultValueString,
+            defaultValueString: null, // Don't pass default to nested values
             isFirstLoop: false,
             parsedKey: 'v',
           );
 
-          if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
+          if (dartType.isNullableType || hasDefaultValue) {
+            final fallback = hasDefaultValue ? ' ?? $defaultValueString' : '';
             return '($effectiveParsedKey as Map<String, dynamic>?)?.map((k, v) '
-                '=> MapEntry(k, $parsedMapValueType))$defaultValueExpression';
+                '=> MapEntry(k, $parsedMapValueType))$fallback';
           } else {
             return '($effectiveParsedKey as Map<String, dynamic>).map((k, v) => '
-                'MapEntry(k, $parsedMapValueType))$defaultValueExpression';
+                'MapEntry(k, $parsedMapValueType))';
           }
         }
       }
@@ -160,8 +162,9 @@ class FromJsonFieldParser {
       final typeNameString = dartType.typeName(forceNullable: false);
       final baseTypeName = typeNameString.replaceAll('?', '');
 
-      if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
-        return '$effectiveParsedKey == null ? null : '
+      if (dartType.isNullableType || hasDefaultValue) {
+        final fallback = hasDefaultValue ? defaultValueString! : 'null';
+        return '$effectiveParsedKey == null ? $fallback : '
             '$baseTypeName.values.byName($effectiveParsedKey as String)';
       } else {
         return '$baseTypeName.values.byName($effectiveParsedKey as String)';
@@ -174,8 +177,9 @@ class FromJsonFieldParser {
       final typeNameString = dartType.typeName(forceNullable: false);
       final baseTypeName = typeNameString.replaceAll('?', '');
 
-      if (dartType.isNullableType || defaultValueExpression.isNotEmpty) {
-        return '$effectiveParsedKey == null ? null : '
+      if (dartType.isNullableType || hasDefaultValue) {
+        final fallback = hasDefaultValue ? defaultValueString! : 'null';
+        return '$effectiveParsedKey == null ? $fallback : '
             '$baseTypeName.fromJson($effectiveParsedKey as Map<String, dynamic>)';
       } else {
         return '$baseTypeName.fromJson($effectiveParsedKey as Map<String, dynamic>)';
@@ -183,8 +187,13 @@ class FromJsonFieldParser {
     }
 
     final typeNameString = dartType.typeName(
-      forceNullable: dartType.isNullableType || defaultValueExpression.isNotEmpty,
+      forceNullable: dartType.isNullableType || hasDefaultValue,
     );
-    return '$effectiveParsedKey as $typeNameString$defaultValueExpression';
+
+    if (hasDefaultValue) {
+      return '$effectiveParsedKey as $typeNameString ?? $defaultValueString';
+    } else {
+      return '$effectiveParsedKey as $typeNameString';
+    }
   }
 }
